@@ -3,15 +3,16 @@ import pathlib
 
 
 def read_audiente(file, filename):
-    # filename returns list of strings in YYYY-MM-DD format
-    # date returns string of date
+    # Filename returns list of strings in YYYY-MM-DD format
+    # Date returns string of date
+    # Function creates empty folders for YYYY/MM/DD, files are saved in YYYY/MM/DD/name_as_YYYY-MM-DD.csv
+
     date = str(filename[24:35][:11])
     filename = filename[25:35][:11].split("-")
-    print(filename[0])
-    pathlib.Path('Data/' + filename[0] + '/' + filename[1]).mkdir(parents=True, exist_ok=True)
+    pathlib.Path('Data/' + filename[0] + '/' + filename[1] + '/' + filename[2]).mkdir(parents=True, exist_ok=True)
     df = pd.read_excel(file, sheet_name=1)
     df.iloc[1:109, [0, 18, 20]].to_csv(pathlib.Path
-                                       ('Data/' + filename[0] + '/' + filename[1] + '/' + date + '.csv'))
+                                       ('Data/' + filename[0] + '/' + filename[1] + '/' + filename[2] + '/' + date + '.csv'))
 
 
 def test_print(file):

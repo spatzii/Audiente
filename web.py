@@ -1,14 +1,19 @@
 import streamlit as st
+import pathlib
+import datetime
 import main
 
 
 st.title("Audiențe Digi24")
-my_file = st.file_uploader('Select a file...', type='xlsx', key='upload')
 
-if my_file is not None:
-    main.read_audiente(my_file, my_file.name)
-    #st.text(my_file.name)
-    # st.text(main.test_print('Data/Upload Test.csv'))
+selection = st.date_input('Vezi audiențele din...', key='date_select')
+files = (list(pathlib.Path('Data/').glob(selection.strftime('%Y') + '/' +
+                                         selection.strftime('%m') + '/' +
+                                         selection.strftime('%d') + '/' +
+                                         '*.csv')))
+for file in files:
+    st.write("Acestea sunt audiențele din ", selection.strftime('%x'))
+    st.write(main.test_print(file))
 
 
-st.session_state
+# st.session_state
