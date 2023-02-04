@@ -1,5 +1,10 @@
 import pandas as pd
 import pathlib
+# import pandas.io.formats.style
+
+tronsoane = ["Selectează tronsonul", '2:00 - 6:00', '6-9 Matinal', '9-12 Știrile Dimineții',
+             "12-15 Știrile Zilei", 'Studio Politic', '16-19 Știrile Amiezii',
+             'Business Club', 'Jurnalul de Seară', '23:00 Știrile Serii']
 
 
 def read_audiente(file, filename):
@@ -29,7 +34,44 @@ def read_audiente(file, filename):
 
 def test_print(file):
     csv = pd.read_csv(file)
+    # pandas.io.formats.style.Styler.format(csv, precision=2)
     return csv
 
 
-
+def audienta_tronsoane(other_file, time_slots):
+    if time_slots == tronsoane[1]:
+        new_csv = pd.read_csv(other_file)
+        new_csv = new_csv.iloc[0:17, 0:4]
+        return new_csv
+    if time_slots == tronsoane[2]:
+        new_csv = pd.read_csv(other_file)
+        new_csv = new_csv.iloc[17:30, 0:4]
+        return new_csv
+    if time_slots == tronsoane[3]:
+        new_csv = pd.read_csv(other_file)
+        new_csv = new_csv.iloc[30:43, 0:4]
+        return new_csv
+    if time_slots == tronsoane[4]:
+        new_csv = pd.read_csv(other_file)
+        new_csv = new_csv.iloc[43:56, 0:4]
+        return new_csv
+    if time_slots == tronsoane[5]:
+        new_csv = pd.read_csv(other_file)
+        new_csv = new_csv.iloc[56:61, 0:4]
+        return new_csv
+    if time_slots == tronsoane[6]:
+        new_csv = pd.read_csv(other_file)
+        new_csv = new_csv.iloc[61:74, 0:4]
+        return new_csv
+    if time_slots == tronsoane[7]:
+        new_csv = pd.read_csv(other_file)
+        new_csv = new_csv.iloc[74:79, 0:4]
+        return new_csv
+    if time_slots == tronsoane[8]:
+        new_csv = pd.read_csv(other_file)
+        new_csv = new_csv.iloc[79:92, 0:4]
+        return new_csv
+    if time_slots == tronsoane[9]:
+        new_csv = pd.read_csv(other_file)
+        new_csv = new_csv.iloc[92:106, 0:4]
+        return new_csv

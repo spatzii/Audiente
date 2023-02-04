@@ -3,12 +3,10 @@ import pandas as pd
 # 18 - Digi
 # 21 - Antena3
 df_3 = pd.read_excel('Audiente Sferturi/Digi 24-audiente zilnice 2023-02-02.xlsx', sheet_name=1)
-df_4 = pd.read_excel('Audiente Sferturi/Digi 24-audiente zilnice 2023-02-03.xlsx', sheet_name=1)
-print(df_3.iloc[1:109, [0, 18, 21]])
-print(df_4.iloc[1:109, [0, 18, 20]])
+df_3.iloc[1:109, [0, 18, 21]].to_csv("Test.csv")
+df = pd.read_csv("Test.csv")
+print(df.iloc[0:16, 0:4])
 
-if df_3.iloc[1, 21] == "Antena 3 CNN":
-    print("yes!")
 
 
 
