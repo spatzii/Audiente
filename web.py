@@ -13,7 +13,10 @@ files = (list(pathlib.Path('Data/').glob(selection.strftime('%Y') + '/' +
                                          '*.csv')))
 for file in files:
     st.write("Acestea sunt audiențele din ", selection.strftime('%x'))
-    st.write(main.test_print(file))
+    rating_file = main.test_print(file).style.set_precision(2)  # .highlight_max(axis=0)
+    st.dataframe(rating_file)
+
+
 
 
 # st.session_state
