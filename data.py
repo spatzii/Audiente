@@ -15,14 +15,14 @@ tronsoane_dict = [{'tronson': "Selectează tronsonul "},
 tronsoane = [x.get('tronson') for x in tronsoane_dict]
 
 
-def read_audiente(file, filename):
+def xlsx_to_csv(file, filename):
     # FOR UPLOAD FUNCTION // Converts xlsx to csv for 'Digi24' and 'Antena 3 CNN'
     # 'Filename' returns list of strings in YYYY-MM-DD format
     # 'Date' returns string of date
     # Function creates empty folders for YYYY/MM/DD, files are saved in YYYY/MM/DD/name_as_YYYY-MM-DD.csv
 
-    date = str(filename[24:35][:11])
-    filename = filename[25:35][:11].split("-")
+    date = str(filename[25:35])
+    filename = filename[25:35].split("-")
     pathlib.Path('Data/' + filename[0] + '/' + filename[1] + '/' + filename[2]).mkdir(parents=True, exist_ok=True)
     df = pd.read_excel(file, sheet_name=1)
 
@@ -52,7 +52,8 @@ def whole_day(file, chart=False):
         csv = pd.read_csv(file).iloc[:, 1:4]
         hl_averages = [16, 29, 42, 55, 60, 73, 78, 91, 100, 105]
         # Indexes of rating averages in dataframe, for highlighting
-        csv = csv.style.apply(lambda x: ['color: red' if x.name in hl_averages else '' for i in x], axis=1).set_precision(2)
+        csv = csv.style.apply(lambda x: ['color: red' if x.name in hl_averages else '' for i in x],
+                              axis=1).set_precision(2)
         return csv
     elif chart is True:
         csv = pd.read_csv(file, skiprows=[17, 30, 43, 56, 61, 74, 79, 92, 101, 107]).iloc[:, 1:4]
@@ -72,17 +73,13 @@ def audienta_tronsoane(other_file, time_slots):
                                        axis=1).set_precision(2)
 
 
-# work in progress
-
-# def audienta_tronsoane_for_graph(other_file, time_slots):
-#     for tronson in tronsoane_dict:
-#         if tronson['tronson'] == time_slots:
-#             slot = tronson.get('loc')
-#             print(slot)
-#             slot.pop(-1)
-#             new_csv = pd.read_csv(other_file)
-#             new_csv = new_csv.iloc[slot, 1:4]
-#             print(new_csv)
-#             return new_csv
+def audienta_tronsoane_for_graph(other_file, time_slots):
+    for tronson in tronsoane_dict:
+        if tronson['tronson'] == time_slots:
+            slot = tronson.get('loc')
+            slot_without_sum = slot[:-1]
+            csv = pd.read_csv(other_file)
+            csv = csv.iloc[slot_without_sum, 1:4]
+            return csv.style.set_precision(2)
 
 

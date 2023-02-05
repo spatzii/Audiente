@@ -30,10 +30,12 @@ with st.expander("Audiențe tronsoane"):
         if time_slots is not data.tronsoane[0]:
             new_rating_file = data.audienta_tronsoane(file, time_slots)
             st.dataframe(new_rating_file, width=600)
+
         hourly_chart_btn = st.button('Rapoarte de tronson', key=['hourly_chart'])
+
         if hourly_chart_btn is True:
-            # WORK IN PROGRESS new_rating_file = data.audienta_tronsoane_for_graph(file, time_slots)
-            st.line_chart(new_rating_file, x="Timebands", y=["Digi 24", "Antena 3 CNN"])
+            rating_file = data.audienta_tronsoane_for_graph(file, time_slots)
+            st.line_chart(rating_file, x="Timebands", y=["Digi 24", "Antena 3 CNN"])
 
 
 # st.session_state
