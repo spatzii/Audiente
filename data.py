@@ -1,13 +1,14 @@
 import pandas as pd
 import pathlib
 
-tronsoane_dict = [{'tronson': '2:00 - 6:00', 'loc': list(range(0, 17))},
+tronsoane_dict = [{'tronson': "Selectează tronsonul "},
+                  {'tronson': '2:00 - 6:00', 'loc': list(range(0, 17))},
                   {'tronson': '6-9 Matinal', 'loc': list(range(17, 30))},
                   {'tronson': '9-12 Știrile Dimineții', 'loc': list(range(30, 43))},
                   {'tronson': '12-15 Știrile Amiezii', 'loc': list(range(43, 56))},
                   {'tronson': 'Studio Politic', 'loc': list(range(56, 61))},
                   {'tronson': '16-19 Știrile Zilei', 'loc': list(range(61, 74))},
-                  {'tronson': 'Business Club', 'loc': list(range(74, 49))},
+                  {'tronson': 'Business Club', 'loc': list(range(74, 79))},
                   {'tronson': 'Jurnalul de Seară', 'loc': list(range(79, 92))},
                   {'tronson': '23:00 Știrile Serii', 'loc': list(range(92, 106))}]
 
@@ -43,19 +44,25 @@ def read_audiente(file, filename):
         return False
 
 
-def whole_day(file):
+def whole_day(file, chart=False):
     # Reads ratings for the entire day out of .csv files
-    csv = pd.read_csv(file).iloc[:, 1:4]
-    hl_averages = [16, 29, 42, 55, 60, 73, 78, 91, 100]  # Indexes of rating averages in dataframe, for highlighting
-    print(type(csv))
-    csv = csv.style.apply(lambda x: ['color: red' if x.name in hl_averages else '' for i in x], axis=1).set_precision(2)
-    return csv
+    # Chart is True = Reads ratings for the entire day out of .csv files,
+    #              but skips time slot averages rows for use in charts
+    if chart is False:
+        csv = pd.read_csv(file).iloc[:, 1:4]
+        hl_averages = [16, 29, 42, 55, 60, 73, 78, 91, 100, 105]
+        # Indexes of rating averages in dataframe, for highlighting
+        csv = csv.style.apply(lambda x: ['color: red' if x.name in hl_averages else '' for i in x], axis=1).set_precision(2)
+        return csv
+    elif chart is True:
+        csv = pd.read_csv(file, skiprows=[17, 30, 43, 56, 61, 74, 79, 92, 101, 107]).iloc[:, 1:4]
+        return csv.style.set_precision(2)
 
 
 def audienta_tronsoane(other_file, time_slots):
     # Reads ratings based on time slots out of .csv files
     # hl_averages is row index of rating averages in csv files for each timeslot
-    hl_averages = [16, 29, 42, 55, 60, 73, 78, 91, 100]
+    hl_averages = [16, 29, 42, 55, 60, 73, 78, 91, 100, 105, 106]
     for tronson in tronsoane_dict:
         if tronson['tronson'] == time_slots:
             slot = tronson.get('loc')
@@ -63,4 +70,19 @@ def audienta_tronsoane(other_file, time_slots):
             new_csv = new_csv.iloc[slot, 1:4]
             return new_csv.style.apply(lambda x: ['color: red' if x.name in hl_averages else '' for i in x],
                                        axis=1).set_precision(2)
+
+
+# work in progress
+
+# def audienta_tronsoane_for_graph(other_file, time_slots):
+#     for tronson in tronsoane_dict:
+#         if tronson['tronson'] == time_slots:
+#             slot = tronson.get('loc')
+#             print(slot)
+#             slot.pop(-1)
+#             new_csv = pd.read_csv(other_file)
+#             new_csv = new_csv.iloc[slot, 1:4]
+#             print(new_csv)
+#             return new_csv
+
 
