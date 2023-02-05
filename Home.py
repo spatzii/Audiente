@@ -1,14 +1,13 @@
 import streamlit as st
 import pathlib
-import matplotlib
-import main
+import data
 import datetime
-import pandas as pd
+
 
 
 st.title("Audiențe Digi24")
 
-selection = st.date_input('Vezi audiențele din...', key='date_select')
+selection = st.date_input('Selectează data audiențelor...', key='date_select')
 files = (list(pathlib.Path('Data/').glob(selection.strftime('%Y') + '/' +
                                          selection.strftime('%m') + '/' +
                                          selection.strftime('%d') + '/' +
@@ -18,24 +17,26 @@ files = (list(pathlib.Path('Data/').glob(selection.strftime('%Y') + '/' +
 with st.expander("Audiențe whole day"):
     for file in files:
         st.write("Acestea sunt audiențele din ", selection.strftime('%x'))
-        rating_file = main.whole_day(file)
+        rating_file = data.whole_day(file)
         st.dataframe(rating_file, width=400)
+        daily_chart_btn = st.button('Rapoarte whole day', key=['daily_chart'])
+        if daily_chart_btn is True:
+            st.line_chart(rating_file, x="Timebands", y=["Digi 24", "Antena 3 CNN"])
 
 
 with st.expander("Audiențe tronsoane"):
     for file in files:
-        time_slots = st.selectbox('Selectează tronsonul', main.tronsoane, key="tronson",
+        time_slots = st.selectbox('Selectează tronsonul', data.tronsoane, key="tronson",
                                   label_visibility="hidden")
-        if time_slots is not main.tronsoane[0]:
-            new_rating_file = main.audienta_tronsoane(file, time_slots)
+        if time_slots is not data.tronsoane[0]:
+            new_rating_file = data.audienta_tronsoane(file, time_slots)
             st.dataframe(new_rating_file, width=600)
+        hourly_chart_btn = st.button('Rapoarte de tronson', key=['hourly_chart'])
+        if hourly_chart_btn is True:
+            st.line_chart(rating_file, x="Timebands", y=["Digi 24", "Antena 3 CNN"])
 
-    # if time_slots is not None:
-    #     new_rating_file = main.audienta_tronsoane(rating_file, time_slots)
-    #     st.dataframe(new_rating_file)
 
-
-# st.session_state['tronson']
+# st.session_state
 
 
 
