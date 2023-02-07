@@ -1,0 +1,14 @@
+# Known bugs:
+
+- line 36 in Home.py, use try/except to catch error when default 'Selectează tronsonul' option is entered in the selectbox.
+    Otherwise, it throws error because there is no dictionary entry for 'Selecteaza tronsonul'. Can be fixed
+- slot_ratings_for_graph_by_minute in data throws error when selecting '2:00 - 6:00' for graph because Minute ratings doesn't
+    provide data. Needs something like 'if data exists...'
+- Function in data/xlsx_to_csv_quarters() doesn't catch missing columns in rating files, it uses exceptions to overcome this.
+    Code has to be rewritten with 'loc' instead of 'iloc' and a method
+
+
+# To improve:
+
+- line 46 in data: more concise filename generator, using f-strings
+- Home.py, lines 10/14: Needs simple method to get file names in folders for Minutes or Quarters
