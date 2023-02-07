@@ -38,7 +38,6 @@ def xlsx_to_csv_minutes(file, filename):
     # from different file
 
     date = str(filename[34:44])
-    print(date)
     filename = filename[34:44].split("-")
     pathlib.Path('Data/Minutes/' + filename[0] + '/' + filename[1] + '/' + filename[2]) \
         .mkdir(parents=True, exist_ok=True)
@@ -72,7 +71,6 @@ def slot_ratings(file, time_slots):
     for slot in libraries.digi24_slots:
         if slot['tronson'] == time_slots:
             slot_position = slot.get('loc_q')
-            print(slot_position)
             new_csv = pd.read_csv(file)
             new_csv = new_csv.iloc[slot_position, 1:4]
             return new_csv.style.apply(lambda x: ['color: red' if x.name in hl_averages else '' for i in x],
@@ -84,7 +82,6 @@ def slot_ratings_for_graph_by_minute(file, time_slots):
         if slot['tronson'] == time_slots:
             slot_position = slot.get('loc_m')
             csv = pd.read_csv(file)
-            print(slot_position)
             csv = csv.iloc[slot_position, 1:4]
             return csv.style.set_precision(2)
 

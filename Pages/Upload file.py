@@ -16,5 +16,3 @@ else:
     if data.xlsx_to_csv_quarters(my_file, my_file.name) is False:
         st.error("Fișierul de audiențe are o problemă de layout. "
                  "Verifică poziția Antenei 3. FIȘIERUL NU A FOST SALVAT")
-
-st.experimental_rerun()
