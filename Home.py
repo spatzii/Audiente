@@ -77,10 +77,3 @@ with ratings_slot:
 
     except ValueError:
         pass
-
-
-
-
-
-
-
