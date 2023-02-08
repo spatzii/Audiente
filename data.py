@@ -19,13 +19,13 @@ def xlsx_to_csv_quarters(file, filename):
     # column index might point to another station.
 
     if df.iloc[1, 21] == "Antena 3 CNN":
-        df.iloc[1:109, [0, 18, 21]].to_csv(pathlib.Path
+        df.iloc[1:109, [0, 18, 21, 22, 28, 29]].to_csv(pathlib.Path
                                            ('Data/Quarters/' + filename[0] + '/' + filename[1] +
                                             '/' + filename[2] + '/' + date + '.csv'),
                                            header=False)
 
     elif df.iloc[1, 20] == "Antena 3 CNN":
-        df.iloc[1:109, [0, 18, 20]].to_csv(pathlib.Path
+        df.iloc[1:109, [0, 18, 21, 22, 28, 29]].to_csv(pathlib.Path
                                            ('Data/Quarters/' + filename[0] + '/' + filename[1] +
                                             '/' + filename[2] + '/' + date + '.csv'),
                                            header=False)
@@ -57,11 +57,11 @@ def whole_day_ratings(file, chart=False):
         hl_averages = [16, 29, 42, 55, 60, 73, 78, 91, 100, 105]
         # Indexes of rating averages in dataframe, for highlighting
         csv = csv.style.apply(lambda x: ['color: red' if x.name in hl_averages else '' for i in x],
-                              axis=1).set_precision(2)
+                              axis=1).format(precision=2)
         return csv
     elif chart is True:
         csv = pd.read_csv(file, skiprows=[17, 30, 43, 56, 61, 74, 79, 92, 101, 107]).iloc[:, 1:4]
-        return csv.style.set_precision(2)
+        return csv.style.format(precision=2)
 
 
 def slot_ratings(file, time_slots):
@@ -74,7 +74,7 @@ def slot_ratings(file, time_slots):
             new_csv = pd.read_csv(file)
             new_csv = new_csv.iloc[slot_position, 1:4]
             return new_csv.style.apply(lambda x: ['color: red' if x.name in hl_averages else '' for i in x],
-                                       axis=1).set_precision(2)
+                                       axis=1).format(precision=2)
 
 
 def slot_ratings_for_graph_by_minute(file, time_slots):
@@ -83,5 +83,19 @@ def slot_ratings_for_graph_by_minute(file, time_slots):
             slot_position = slot.get('loc_m')
             csv = pd.read_csv(file)
             csv = csv.iloc[slot_position, 1:4]
-            return csv.style.set_precision(2)
+            return csv.style.format(precision=2)
+
+
+def test_display(file, stations, graph):
+    hl_averages = [16, 29, 42, 55, 60, 73, 78, 91, 100, 105]
+    if graph is False:
+        stations.insert(0, 1)
+        csv = pd.read_csv(file).iloc[:, stations]
+        # csv = csv.style.apply(lambda x: ['color: red' if x.name in hl_averages else '' for i in x],
+        #                       axis=1).format(precision=2)
+        return csv.style.apply(lambda x: ['color: red' if x.name in hl_averages else '' for i in x],
+                               axis=1).format(precision=2)
+    elif graph is True:
+        csv = pd.read_csv(file).iloc[:, stations]
+        return csv
 

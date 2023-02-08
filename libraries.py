@@ -1,3 +1,7 @@
+import pathlib
+import datetime
+
+
 digi24_slots = [{'tronson': "Selectează tronsonul "},
                 {'tronson': '2:00 - 6:00', 'loc_q': list(range(0, 17))},
                 {'tronson': '6-9 Matinal', 'loc_q': list(range(17, 30)), 'loc_m': list(range(0, 180))},
@@ -10,3 +14,9 @@ digi24_slots = [{'tronson': "Selectează tronsonul "},
                 {'tronson': '23:00 Știrile Serii', 'loc_q': list(range(92, 106)), 'loc_m': list(range(1020, 1140))}]
 
 digi24_slot_names = [x.get('tronson') for x in digi24_slots]
+
+all_channels = [{'tv': 'Digi 24', 'loc': 2}, {'tv': 'Antena 3 CNN', 'loc': 3},
+                {'tv': 'B1TV', 'loc': 4}, {'tv': 'Realitatea Plus', 'loc': 5},
+                {'tv': 'Romania TV', 'loc': 6}]
+
+
