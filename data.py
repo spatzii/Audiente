@@ -42,26 +42,37 @@ def xlsx_to_csv_minutes(file, filename):
     pathlib.Path('Data/Minutes/' + filename[0] + '/' + filename[1] + '/' + filename[2]) \
         .mkdir(parents=True, exist_ok=True)
     df = pd.read_excel(file, sheet_name=2)
-    df.iloc[1:1143, [0, 18, 21]].to_csv(pathlib.Path
+    df.iloc[1:1143, [0, 18, 21, 22, 28, 29]].to_csv(pathlib.Path
                                         ('Data/Minutes/' + filename[0] + '/' + filename[1] +
                                          '/' + filename[2] + '/' + date + '.csv'),
                                         header=False)
 
 
-def whole_day_ratings(file, chart=False):
-    # Reads ratings for the entire day out of .csv files
-    # Chart is True = Reads ratings for the entire day out of .csv files,
+def whole_day_ratings(file, stations, graph):
+    # Reads ratings for the entire day out of .csv files.
+    # Gets input as list of ilocs from dictionary of stations
+    # graph True = Reads ratings for the entire day out of .csv files,
     #              but skips time slot averages rows for use in charts
-    if chart is False:
-        csv = pd.read_csv(file).iloc[:, 1:4]
-        hl_averages = [16, 29, 42, 55, 60, 73, 78, 91, 100, 105]
-        # Indexes of rating averages in dataframe, for highlighting
-        csv = csv.style.apply(lambda x: ['color: red' if x.name in hl_averages else '' for i in x],
-                              axis=1).format(precision=2)
+    hl_averages = [16, 29, 42, 55, 60, 73, 78, 91, 100, 105]
+    if graph is False:
+        stations.insert(0, 1)
+        csv = pd.read_csv(file).iloc[:, stations]
+        return csv.style.apply(lambda x: ['color: red' if x.name in hl_averages else '' for i in x],
+                               axis=1).format(precision=2)
+    elif graph is True:
+        csv = pd.read_csv(file, skiprows = [17, 30, 43, 56, 61, 74, 79, 92, 101, 107]).iloc[:, stations]
         return csv
-    elif chart is True:
-        csv = pd.read_csv(file, skiprows=[17, 30, 43, 56, 61, 74, 79, 92, 101, 107]).iloc[:, 1:4]
-        return csv.style.format(precision=2)
+
+
+def slot_ratings_test(file, time_slots, stations):
+    # stations.insert(0, 1)
+    hl_averages = [16, 29, 42, 55, 60, 73, 78, 91, 100, 105, 106]
+    for slot in libraries.digi24_slots:
+        if slot['tronson'] == time_slots:
+            slot_position = slot.get('loc_q')
+            csv = pd.read_csv(file).iloc[slot_position, stations]
+            return csv.style.apply(lambda x: ['color: red' if x.name in hl_averages else '' for i in x],
+                                   axis=1).format(precision=2)
 
 
 def slot_ratings(file, time_slots):
@@ -77,25 +88,13 @@ def slot_ratings(file, time_slots):
                                        axis=1).format(precision=2)
 
 
-def slot_ratings_for_graph_by_minute(file, time_slots):
+def slot_ratings_for_graph_by_minute(file, time_slots, stations):
+
     for slot in libraries.digi24_slots:
         if slot['tronson'] == time_slots:
             slot_position = slot.get('loc_m')
-            csv = pd.read_csv(file)
-            csv = csv.iloc[slot_position, 1:4]
+            csv = pd.read_csv(file).iloc[slot_position, stations]
             return csv.style.format(precision=2)
 
 
-def test_display(file, stations, graph):
-    hl_averages = [16, 29, 42, 55, 60, 73, 78, 91, 100, 105]
-    if graph is False:
-        stations.insert(0, 1)
-        csv = pd.read_csv(file).iloc[:, stations]
-        # csv = csv.style.apply(lambda x: ['color: red' if x.name in hl_averages else '' for i in x],
-        #                       axis=1).format(precision=2)
-        return csv.style.apply(lambda x: ['color: red' if x.name in hl_averages else '' for i in x],
-                               axis=1).format(precision=2)
-    elif graph is True:
-        csv = pd.read_csv(file).iloc[:, stations]
-        return csv
 
