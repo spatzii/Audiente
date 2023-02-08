@@ -64,7 +64,7 @@ def whole_day_ratings(file, stations, graph):
         return csv
 
 
-def slot_ratings_test(file, time_slots, stations):
+def slot_ratings(file, time_slots, stations):
     # stations.insert(0, 1)
     hl_averages = [16, 29, 42, 55, 60, 73, 78, 91, 100, 105, 106]
     for slot in libraries.digi24_slots:
@@ -73,19 +73,6 @@ def slot_ratings_test(file, time_slots, stations):
             csv = pd.read_csv(file).iloc[slot_position, stations]
             return csv.style.apply(lambda x: ['color: red' if x.name in hl_averages else '' for i in x],
                                    axis=1).format(precision=2)
-
-
-def slot_ratings(file, time_slots):
-    # Reads ratings based on time slots out of .csv files
-    # hl_averages is row index of rating averages in csv files for each timeslot
-    hl_averages = [16, 29, 42, 55, 60, 73, 78, 91, 100, 105, 106]
-    for slot in libraries.digi24_slots:
-        if slot['tronson'] == time_slots:
-            slot_position = slot.get('loc_q')
-            new_csv = pd.read_csv(file)
-            new_csv = new_csv.iloc[slot_position, 1:4]
-            return new_csv.style.apply(lambda x: ['color: red' if x.name in hl_averages else '' for i in x],
-                                       axis=1).format(precision=2)
 
 
 def slot_ratings_for_graph_by_minute(file, time_slots, stations):
