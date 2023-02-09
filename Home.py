@@ -24,16 +24,19 @@ ratings_whole_day, graph_all_day, ratings_slot, graph_slot = st.tabs(['Audiențe
 checkbox = []
 active_stations_location = []
 active_stations_names = []
-if len(quarter_files) > 0:
-    with st.sidebar:
-        # A checkbox is created for every channel in the all_channels dict. If the checkbox is selected,
-        # that channel's index is retrieved from all_channels in libraries, added to a list, and passed to the
-        # read.CSV function as iloc parameter. Dataframe is not displayed if passed list is empty.
+
+with st.sidebar:
+    # A checkbox is created for every channel in the all_channels dict. If the checkbox is selected,
+    # that channel's index is retrieved from all_channels in libraries, added to a list, and passed to the
+    # read.CSV function as iloc parameter. Dataframe is not displayed if passed list is empty.
+    if len(quarter_files) > 0:
         for channel in libraries.all_channels:
             checkbox.append(st.checkbox(label=channel.get('tv'), key=channel.get('tv')))
             if st.session_state[channel.get('tv')] is True:
                 active_stations_location.append(channel.get('loc'))
                 active_stations_names.append(channel.get('tv'))
+    time_slots = st.selectbox('Selectează tronsonul', libraries.digi24_slot_names,
+                              key="tronson", label_visibility="hidden")
 
 with ratings_whole_day:
     for file in quarter_files:
@@ -51,36 +54,32 @@ with ratings_whole_day:
                 st.info("Alege posturile TV din bara din stânga")
 
 with ratings_slot:
-    with st.sidebar:
-        time_slots = st.selectbox('Selectează tronsonul', libraries.digi24_slot_names,
-                                  key="tronson", label_visibility="hidden")
+
     if time_slots != 'Selectează tronsonul ' and len(active_stations_location) < 1:
         st.info("Alege posturile TV din bara din stânga")
     if time_slots == 'Selectează tronsonul ':
         st.info("Alege tronsonul din bara din stânga")
-    try:
-        if len(active_stations_location) > 0:
-            for file in quarter_files:
-                new_rating_file = data.slot_ratings(file, time_slots, active_stations_location)
-                st.dataframe(new_rating_file, width=600)
+    if len(active_stations_location) > 0 and time_slots != 'Selectează tronsonul ':
+        for file in quarter_files:
+            new_rating_file = data.slot_ratings(file, time_slots, active_stations_location)
+            st.dataframe(new_rating_file, width=600)
 
-        # for minute_file in minute_files:
-        #     raw_minute_file = data.whole_day_by_minute(minute_file, active_stations_location)
-        #     for station in active_stations_names:
-        #         max_values = data.slot_records(station, raw_minute_file)
-        #         print(max_values)
-        #         st.write(f'Vârful de audiență al postului ', station, 'a fost de ', str(max_values[station]))
+with graph_slot:
+    if time_slots != 'Selectează tronsonul ' and len(active_stations_location) < 1:
+        st.info("Alege posturile TV din bara din stânga")
+    if time_slots == 'Selectează tronsonul ':
+        st.info("Alege tronsonul din bara din stânga")
+    if len(active_stations_location) > 0 and time_slots != 'Selectează tronsonul ':
+        for minute_file in minute_files:
+            minute_file = data.slot_ratings_for_graph_by_minute(minute_file,
+                                                                time_slots, active_stations_location)
+            st.line_chart(minute_file, x="Timebands", y=active_stations_names)
 
-        with graph_slot:
-            if time_slots != 'Selectează tronsonul ' and len(active_stations_location) < 1:
-                st.info("Alege posturile TV din bara din stânga")
-            if time_slots == 'Selectează tronsonul ':
-                st.info("Alege tronsonul din bara din stânga")
-            if len(active_stations_location) > 0:
-                for minute_file in minute_files:
-                    minute_file = data.slot_ratings_for_graph_by_minute(minute_file,
-                                                                        time_slots, active_stations_location)
-                    st.line_chart(minute_file, x="Timebands", y=active_stations_names)
 
-    except ValueError:
-        pass
+
+# for minute_file in minute_files:
+#     raw_minute_file = data.whole_day_by_minute(minute_file, active_stations_location)
+#     for station in active_stations_names:
+#         max_values = data.slot_records(station, raw_minute_file)
+#         print(max_values)
+#         st.write(f'Vârful de audiență al postului ', station, 'a fost de ', str(max_values[station]))

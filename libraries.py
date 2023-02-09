@@ -2,7 +2,7 @@ import pathlib
 import datetime
 
 
-digi24_slots = [{'tronson': "Selectează tronsonul "},
+digi24_slots = [{'tronson': "Selectează tronsonul ", 'value': 'dummy'},
                 {'tronson': '2:00 - 6:00', 'loc_q': list(range(0, 17))},
                 {'tronson': '6-9 Matinal', 'loc_q': list(range(17, 30)), 'loc_m': list(range(0, 180))},
                 {'tronson': '9-12 Știrile Dimineții', 'loc_q': list(range(30, 43)), 'loc_m': list(range(180, 360))},
