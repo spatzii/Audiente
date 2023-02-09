@@ -64,6 +64,13 @@ with ratings_slot:
                 new_rating_file = data.slot_ratings(file, time_slots, active_stations_location)
                 st.dataframe(new_rating_file, width=600)
 
+        # for minute_file in minute_files:
+        #     raw_minute_file = data.whole_day_by_minute(minute_file, active_stations_location)
+        #     for station in active_stations_names:
+        #         max_values = data.slot_records(station, raw_minute_file)
+        #         print(max_values)
+        #         st.write(f'Vârful de audiență al postului ', station, 'a fost de ', str(max_values[station]))
+
         with graph_slot:
             if time_slots != 'Selectează tronsonul ' and len(active_stations_location) < 1:
                 st.info("Alege posturile TV din bara din stânga")

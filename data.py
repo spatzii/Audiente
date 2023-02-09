@@ -83,5 +83,18 @@ def slot_ratings_for_graph_by_minute(file, time_slots, stations):
             csv = pd.read_csv(file).iloc[slot_position, stations]
             return csv.style.format(precision=2)
 
+# def whole_day_by_minute(file, stations):
+#     # Returns dataframe with styling for displaying or raw for number crunching
+#     stations.insert(0, 1)
+#     csv = pd.read_csv(file).iloc[:, stations]
+#     return csv
+
+# def slot_records(station, rating_file):
+#     # Gets the highest value for each channel
+#     # that comes in as value from channel dictionary
+#     for chan in libraries.all_channels:
+#         if chan.get('tv') == station:
+#             return rating_file.max(station)
+
 
 
