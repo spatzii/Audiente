@@ -6,20 +6,13 @@ import datetime
 
 st.title("Audiențe Digi24")
 selection = st.date_input('Selectează data audiențelor...', key='date_select')
-
-
-quarter_files = (list(pathlib.Path('Data/Quarters').glob(selection.strftime('%Y') + '/' +
-                                                         selection.strftime('%m') + '/' +
-                                                         selection.strftime('%d') + '/' +
-                                                         '*.csv')))
-minute_files = (list(pathlib.Path('Data/Minutes').glob(selection.strftime('%Y') + '/' +
-                                                       selection.strftime('%m') + '/' +
-                                                       selection.strftime('%d') + '/' +
-                                                       '*.csv')))
-if len(quarter_files) == 0:
-    st.info("Nu există audiențe încărcate pentru această dată")
+quarter_files = (list(pathlib.Path('Data/Quarters').glob(f"**/{selection.strftime('%Y-%m-%d')}.csv")))
+minute_files = (list(pathlib.Path('Data/Minutes').glob(f"**/{selection.strftime('%Y-%m-%d')}.csv")))
 ratings_whole_day, graph_all_day, ratings_slot, graph_slot = st.tabs(['Audiențe whole day', 'Rapoarte whole day',
                                                                       'Audiențe tronsoane', 'Rapoarte tronsoane'])
+
+if len(quarter_files) == 0:
+    st.info("Nu există audiențe încărcate pentru această dată")
 
 checkbox = []
 active_stations_location = []
