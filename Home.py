@@ -2,7 +2,8 @@ import streamlit as st
 import pathlib
 import data
 import libraries
-import datetime
+import errors
+# import datetime
 
 st.title("Audiențe Digi24")
 selection = st.date_input('Selectează data audiențelor...', key='date_select')
@@ -11,12 +12,13 @@ minute_files = (list(pathlib.Path('Data/Minutes').glob(f"**/{selection.strftime(
 ratings_whole_day, graph_all_day, ratings_slot, graph_slot = st.tabs(['Audiențe whole day', 'Rapoarte whole day',
                                                                       'Audiențe tronsoane', 'Rapoarte tronsoane'])
 
-if len(quarter_files) == 0:
-    st.info("Nu există audiențe încărcate pentru această dată")
-
 checkbox = []
 active_stations_location = []
 active_stations_names = []
+
+if len(quarter_files) == 0:
+    st.info(errors.no_rating_file)
+
 
 with st.sidebar:
     # A checkbox is created for every channel in the all_channels dict. If the checkbox is selected,
@@ -32,43 +34,35 @@ with st.sidebar:
                               key="tronson", label_visibility="hidden")
 
 with ratings_whole_day:
-    for file in quarter_files:
-        if len(active_stations_location) > 0:
-            rating_file = data.whole_day_ratings(file, active_stations_location, graph=False)
-            st.dataframe(rating_file, width=400)
-        elif len(active_stations_location) == 0:
-            st.info("Alege posturile TV din bara din stânga")
-
-        with graph_all_day:
-            if len(active_stations_location) > 0:
-                chart_rating_file = data.whole_day_ratings(file, active_stations_location, graph=True)
-                st.line_chart(chart_rating_file, x="Timebands", y=active_stations_names)
-            elif len(active_stations_location) == 0:
-                st.info("Alege posturile TV din bara din stânga")
+    if len(active_stations_names) == 0 and len(quarter_files) > 0:
+        st.info(errors.choose_station)
+    if len(active_stations_location) > 0:
+        st.dataframe([data.whole_day_ratings(file, active_stations_location) for file in quarter_files][0])
+with graph_all_day:
+    if len(active_stations_names) == 0 and len(quarter_files) > 0:
+        st.info(errors.choose_station)
+    if len(active_stations_location) > 0:
+        st.line_chart([data.whole_day_ratings(file, active_stations_location, data_type='graph')
+                       for file in quarter_files][0], x="Timebands", y=active_stations_names)
 
 with ratings_slot:
-
-    if time_slots != 'Selectează tronsonul ' and len(active_stations_location) < 1:
-        st.info("Alege posturile TV din bara din stânga")
-    if time_slots == 'Selectează tronsonul ':
-        st.info("Alege tronsonul din bara din stânga")
+    if len(active_stations_names) == 0 and len(quarter_files) > 0:
+        st.info(errors.choose_station)
+    if time_slots == 'Selectează tronsonul ' and len(active_stations_location) > 0:
+        st.info(errors.choose_slot)
     if len(active_stations_location) > 0 and time_slots != 'Selectează tronsonul ':
-        for file in quarter_files:
-            new_rating_file = data.slot_ratings(file, time_slots, active_stations_location)
-            st.dataframe(new_rating_file, width=600)
+        st.dataframe([data.slot_ratings(file, time_slots, active_stations_location) for file in quarter_files][0])
 
 with graph_slot:
-    if time_slots != 'Selectează tronsonul ' and len(active_stations_location) < 1:
-        st.info("Alege posturile TV din bara din stânga")
-    if time_slots == 'Selectează tronsonul ':
-        st.info("Alege tronsonul din bara din stânga")
-    if len(active_stations_location) > 0 and time_slots != 'Selectează tronsonul ':
-        for minute_file in minute_files:
-            minute_file = data.slot_ratings_for_graph_by_minute(minute_file,
-                                                                time_slots, active_stations_location)
-            st.line_chart(minute_file, x="Timebands", y=active_stations_names)
-
-
+    if len(active_stations_names) == 0 and len(quarter_files) > 0:
+        st.info(errors.choose_station)
+    if time_slots == 'Selectează tronsonul ' and len(quarter_files) > 0:
+        st.info(errors.choose_slot)
+    if time_slots == '2:00 - 6:00':
+        st.info("Nu există audiențe la minut pentru intervalul 2:00 - 6:00")
+    if len(active_stations_location) > 0 and time_slots != 'Selectează tronsonul ' and time_slots != '2:00 - 6:00':
+        st.line_chart([data.slot_ratings_for_graph_by_minute(file, time_slots, active_stations_location)
+                       for file in minute_files][0], x="Timebands", y=active_stations_names)
 
 # for minute_file in minute_files:
 #     raw_minute_file = data.whole_day_by_minute(minute_file, active_stations_location)

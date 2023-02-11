@@ -20,3 +20,5 @@ all_channels = [{'tv': 'Digi 24', 'loc': 2}, {'tv': 'Antena 3 CNN', 'loc': 3},
                 {'tv': 'Romania TV', 'loc': 6}]
 
 
+
+
