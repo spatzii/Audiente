@@ -11,8 +11,7 @@ def xlsx_to_csv_quarters(file, filename):
 
     date = str(filename[25:35][:11])
     filename = filename[25:35][:11].split("-")
-    pathlib.Path('Data/Quarters/' + filename[0] + '/' + filename[1] + '/' + filename[2]) \
-        .mkdir(parents=True, exist_ok=True)
+    pathlib.Path('Data/Quarters/' + filename[0] + '/' + filename[1]).mkdir(parents=True, exist_ok=True)
     df = pd.read_excel(file, sheet_name=1)
 
     # Temporary fix for bad rating files/missing columns. Function fetches data by column index,
@@ -21,13 +20,13 @@ def xlsx_to_csv_quarters(file, filename):
     if df.iloc[1, 21] == "Antena 3 CNN":
         df.iloc[1:109, [0, 18, 21, 22, 28, 29]].to_csv(pathlib.Path
                                                        ('Data/Quarters/' + filename[0] + '/' + filename[1] +
-                                                        '/' + filename[2] + '/' + date + '.csv'),
+                                                        '/' + date + '.csv'),
                                                        header=False)
 
     elif df.iloc[1, 20] == "Antena 3 CNN":
         df.iloc[1:109, [0, 18, 21, 22, 28, 29]].to_csv(pathlib.Path
                                                        ('Data/Quarters/' + filename[0] + '/' + filename[1] +
-                                                        '/' + filename[2] + '/' + date + '.csv'),
+                                                        '/' + date + '.csv'),
                                                        header=False)
     else:
         return False
@@ -44,7 +43,7 @@ def xlsx_to_csv_minutes(file, filename):
     df = pd.read_excel(file, sheet_name=2)
     df.iloc[1:1143, [0, 18, 21, 22, 28, 29]].to_csv(pathlib.Path
                                                     ('Data/Minutes/' + filename[0] + '/' + filename[1] +
-                                                     '/' + filename[2] + '/' + date + '.csv'),
+                                                     '/' + date + '.csv'),
                                                     header=False)
 
 
@@ -54,15 +53,15 @@ def whole_day_ratings(file, stations, data_type='style'):
     # graph True = Reads ratings for the entire day out of .csv files,
     #              but skips time slot averages rows for use in charts
     hl_averages = [16, 29, 42, 55, 60, 73, 78, 91, 100, 105]
-    if data_type is 'style':
+    if data_type == 'style':
         stations.insert(0, 1)
         csv = pd.read_csv(file).iloc[:, stations]
         return csv.style.apply(lambda x: ['color: red' if x.name in hl_averages else '' for i in x],
                                axis=1).format(precision=2)
-    elif data_type is 'graph':
+    elif data_type == 'graph':
         csv = pd.read_csv(file, skiprows=[17, 30, 43, 56, 61, 74, 79, 92, 101, 107]).iloc[:, stations]
         return csv
-    elif data_type is 'raw':
+    elif data_type == 'raw':
         csv = pd.read_csv(file).iloc[:, stations]
         return csv
 
