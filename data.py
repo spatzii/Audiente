@@ -38,8 +38,7 @@ def xlsx_to_csv_minutes(file, filename):
 
     date = str(filename[34:44])
     filename = filename[34:44].split("-")
-    pathlib.Path('Data/Minutes/' + filename[0] + '/' + filename[1] + '/' + filename[2]) \
-        .mkdir(parents=True, exist_ok=True)
+    pathlib.Path('Data/Minutes/' + filename[0] + '/' + filename[1]).mkdir(parents=True, exist_ok=True)
     df = pd.read_excel(file, sheet_name=2)
     df.iloc[1:1143, [0, 18, 21, 22, 28, 29]].to_csv(pathlib.Path
                                                     ('Data/Minutes/' + filename[0] + '/' + filename[1] +
