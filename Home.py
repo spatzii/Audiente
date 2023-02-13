@@ -16,7 +16,6 @@ ratings_whole_day, graph_all_day, ratings_slot, graph_slot = st.tabs(['Audiențe
                                                                       'Audiențe tronsoane', 'Rapoarte tronsoane'])
 
 checkbox = []
-active_stations_location = []
 active_stations_names = []
 
 if quarter_ratings.exists() is False:
@@ -31,19 +30,18 @@ with st.sidebar:
         for channel in libraries.all_channels:
             checkbox.append(st.checkbox(label=channel.get('tv'), key=channel.get('tv')))
             if st.session_state[channel.get('tv')] is True:
-                active_stations_location.append(channel.get('loc'))
                 active_stations_names.append(channel.get('tv'))
 
 with ratings_whole_day:
     if len(active_stations_names) == 0 and quarter_ratings.exists():
         st.info(errors.choose_station)
-    if len(active_stations_location) > 0:
-        st.dataframe(data.whole_day_ratings(quarter_ratings, active_stations_location))
+    if len(active_stations_names) > 0:
+        st.dataframe(data.whole_day_ratings(quarter_ratings, active_stations_names))
 with graph_all_day:
     if len(active_stations_names) == 0 and quarter_ratings:
         st.info(errors.choose_station)
-    if len(active_stations_location) > 0:
-        st.line_chart(data.whole_day_ratings(quarter_ratings, active_stations_location, data_type='graph'),
+    if len(active_stations_names) > 0:
+        st.line_chart(data.whole_day_ratings(quarter_ratings, active_stations_names, data_type='graph'),
                       x="Timebands", y=active_stations_names)
 
 
@@ -53,10 +51,10 @@ with ratings_slot:
                                   key="tronson", label_visibility="hidden")
     if len(active_stations_names) == 0 and quarter_ratings:
         st.info(errors.choose_station)
-    if time_slots == 'Selectează tronsonul ' and len(active_stations_location) > 0:
+    if time_slots == 'Selectează tronsonul ' and len(active_stations_names) > 0:
         st.info(errors.choose_slot)
-    if len(active_stations_location) > 0 and time_slots != 'Selectează tronsonul ':
-        st.dataframe(data.slot_ratings(quarter_ratings, time_slots, active_stations_location))
+    if len(active_stations_names) > 0 and time_slots != 'Selectează tronsonul ':
+        st.dataframe(data.slot_ratings(quarter_ratings, time_slots, active_stations_names))
 
 with graph_slot:
     if len(active_stations_names) == 0 and quarter_ratings:
@@ -65,8 +63,8 @@ with graph_slot:
         st.info(errors.choose_slot)
     if time_slots == '2:00 - 6:00':
         st.info("Nu există audiențe la minut pentru intervalul 2:00 - 6:00")
-    if len(active_stations_location) > 0 and time_slots != 'Selectează tronsonul ' and time_slots != '2:00 - 6:00':
-        st.line_chart(data.slot_ratings_for_graph_by_minute(minute_ratings, time_slots, active_stations_location),
+    if len(active_stations_names) > 0 and time_slots != 'Selectează tronsonul ' and time_slots != '2:00 - 6:00':
+        st.line_chart(data.slot_ratings_for_graph_by_minute(minute_ratings, time_slots, active_stations_names),
                       x="Timebands", y=active_stations_names)
 
 # for minute_file in minute_files:

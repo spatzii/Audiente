@@ -1,6 +1,6 @@
 import pathlib
 import datetime
-
+# {'tronson': 'Studio Politic', 'loc_q': list(range(56, 61)), 'loc_m': list(range(540, 600))}
 
 digi24_slots = [{'tronson': "Selectează tronsonul ", 'value': 'dummy'},
                 {'tronson': '2:00 - 6:00', 'loc_q': list(range(0, 17))},
@@ -15,9 +15,10 @@ digi24_slots = [{'tronson': "Selectează tronsonul ", 'value': 'dummy'},
 
 digi24_slot_names = [x.get('tronson') for x in digi24_slots]
 
-all_channels = [{'tv': 'Digi 24', 'loc': 2}, {'tv': 'Antena 3 CNN', 'loc': 3},
-                {'tv': 'B1TV', 'loc': 4}, {'tv': 'Realitatea Plus', 'loc': 5},
-                {'tv': 'Romania TV', 'loc': 6}]
+all_channels = [{'tv': 'Digi 24'}, {'tv': 'Antena 3 CNN'}, {'tv': 'B1TV'},
+                {'tv': 'EuroNews'}, {'tv': 'Realitatea Plus'}, {'tv': 'Romania TV'}]
+
+
 
 
 
