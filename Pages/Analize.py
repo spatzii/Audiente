@@ -1,30 +1,46 @@
-# week_days = [day.strftime('%a %d') for day in week if int(day.strftime('%w')) != 0 and int(day.strftime('%w')) < 5]
 import datetime
-
 import pandas as pd
 import streamlit as st
 import pathlib
 import data
 import errors
 import calendar
-# from babel.dates import format_date, format_datetime, format_time
+
 
 weekly_chart, compare_day = st.tabs(['Grafice săptămânale', 'Comparație zile'])
 
 with weekly_chart:
-    select_year = st.selectbox('Alege anul', [str(datetime.date.today().year)])
+    select_year = st.selectbox('Alege anul', [int(datetime.date.today().year)])
     select_month = st.selectbox('Alege luna', calendar.month_name)
 
-    cal = calendar.Calendar().monthdatescalendar(int(select_year),
-                                                 datetime.datetime.strptime(select_month, '%B').date().month)
-    week_days = []
-    for week in cal:
-        for day in week:
-            if int(day.strftime('%w')) != 0 and int(day.strftime('%w')) < 5:
-                week_days.append(day.strftime('%a %d'))
-    week_list = [week_days[0:4], week_days[4:8], week_days[8:12], week_days[12:16], week_days[16:20]]
+    def first_monday(year=select_year, month=datetime.datetime.strptime(select_month, '%B').date().month):
+        # Creates list from calander with 4/5 weeks per month beginning with the first Monday in selected month,
+        # containing only Mondays through Thursdays. Extends into next month if last Monday in month is in
+        # selected month
+        week_days = []
+        local_calendar = calendar.Calendar().monthdatescalendar(year, month)
+        first_monday_in_month = (8 - datetime.date(year, month, 1).weekday()) % 7  # returns datetime
+        for local_week in local_calendar:  # Parses through month and starts list from first monday, selects M-Ts
+            for day in local_week:
+                if day >= datetime.date(year, month, first_monday_in_month) and day.weekday() < 4:
+                    week_days.append(day)
+        return week_days
 
-    # needed_csvs = pathlib.Path('Data/Quarters/2023/02/')
+
+    # Creates lists of weeks with 4 days
+    week_list = [first_monday()[i:i + 4] for i in range(0, len(first_monday()), 4)]
+
+    select_week = st.selectbox("Alege săptămâna", week_list,
+                               format_func=lambda x: f"{datetime.datetime.strftime(x[0], '%d %b')} "
+                                                     f"- {datetime.datetime.strftime(x[3], '%d %b')}")
+    chart_data = []
+    for selected_days in select_week:
+        rating_file = pathlib.Path(f"Data/Quarters/{selected_days.strftime('%Y/%m')}/"
+                                   f"{selected_days.strftime('%Y-%m-%d')}.csv")
+        df = data.whole_day_ratings(rating_file, ['Timebands', 'Digi 24'], data_type='raw')
+        chart_data.append(df.iloc[106, 1])
+
+    week_chart = st.line_chart(chart_data)
 
 with compare_day:
     selected_day = st.date_input('Alege audiențele din...', key='date_1_select')

@@ -34,9 +34,7 @@ def xlsx_to_csv_minutes(file, filename):
 
 def whole_day_ratings(file, stations, data_type='style'):
     # Reads ratings for the entire day out of .csv files.
-    # Gets input as list of ilocs from dictionary of stations
-    # graph True = Reads ratings for the entire day out of .csv files,
-    #              but skips time slot averages rows for use in charts
+    # Gets input as list of locs from dictionary of station names
     hl_averages = [16, 29, 42, 55, 60, 73, 78, 91, 100, 105]
     if data_type == 'style':
         stations.insert(0, 'Timebands')
