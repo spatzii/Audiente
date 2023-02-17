@@ -42,7 +42,7 @@ with graph_all_day:
         st.info(errors.choose_station)
     if len(active_stations_names) > 0:
         st.line_chart(data.whole_day_ratings(quarter_ratings, active_stations_names, data_type='graph'),
-                      x="Timebands", y=active_stations_names)
+                      x=None, y=active_stations_names)
 
 
 with ratings_slot:
@@ -65,7 +65,7 @@ with graph_slot:
         st.info("Nu există audiențe la minut pentru intervalul 2:00 - 6:00")
     if len(active_stations_names) > 0 and time_slots != 'Selectează tronsonul ' and time_slots != '2:00 - 6:00':
         st.line_chart(data.slot_ratings_for_graph_by_minute(minute_ratings, time_slots, active_stations_names),
-                      x="Timebands", y=active_stations_names)
+                      x=None, y=active_stations_names)
 
 # for minute_file in minute_files:
 #     raw_minute_file = data.whole_day_by_minute(minute_file, active_stations_location)

@@ -8,7 +8,6 @@ try:
         file_name = file.name
         if 'minut' in file_name:
             data.xlsx_to_csv_minutes(file, file.name)
-
             if data.xlsx_to_csv_minutes(file, file.name) is False:
                 st.error(f"Fişierul {file_name} are o problemă de layout. "
                          "Verifică poziția Antenei 3. FIȘIERUL NU A FOST SALVAT")

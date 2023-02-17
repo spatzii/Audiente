@@ -7,7 +7,7 @@ import errors
 import calendar
 
 
-weekly_chart, compare_day = st.tabs(['Grafice săptămânale', 'Comparație zile'])
+weekly_chart, compare_day = st.tabs(['Rapoarte săptămânale', 'Comparație zile'])
 
 with weekly_chart:
     select_year = st.selectbox('Alege anul', [int(datetime.date.today().year)])
@@ -33,14 +33,14 @@ with weekly_chart:
     select_week = st.selectbox("Alege săptămâna", week_list,
                                format_func=lambda x: f"{datetime.datetime.strftime(x[0], '%d %b')} "
                                                      f"- {datetime.datetime.strftime(x[3], '%d %b')}")
-    chart_data = []
+    all_data = []
     for selected_days in select_week:
         rating_file = pathlib.Path(f"Data/Quarters/{selected_days.strftime('%Y/%m')}/"
                                    f"{selected_days.strftime('%Y-%m-%d')}.csv")
-        df = data.whole_day_ratings(rating_file, ['Timebands', 'Digi 24'], data_type='raw')
-        chart_data.append(df.iloc[106, 1])
+        df = data.whole_day_ratings(rating_file, ['Digi 24'], data_type='raw')
+        all_data.append(df.loc['Whole day', 'Digi 24'])
 
-    week_chart = st.line_chart(chart_data)
+    st.write(f"Media săptămânii a fost {(sum(all_data))/len(all_data)}")
 
 with compare_day:
     selected_day = st.date_input('Alege audiențele din...', key='date_1_select')

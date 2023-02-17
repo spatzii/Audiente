@@ -16,6 +16,12 @@ def xlsx_to_csv_quarters(file, filename):
                                 skiprows=[0, 1]).set_index('Timebands').iloc[:, [17, 20, 21, 23, 27, 28]]
 
     rating_file.columns = rating_file.columns.str.replace('.1', '', regex=False)
+
+    for avg_index in rating_file.index:
+        if '>>>' in avg_index:
+            index_without_symbols = avg_index.rpartition(">>> ")
+            slot_avg = str(index_without_symbols[2]).replace(':00', '').replace(" ", '')
+            rating_file.rename(index={avg_index: f'Medie {slot_avg}'}, inplace=True)
     rating_file.to_csv(pathlib.Path('Data/Quarters/' + filename[0] + '/' + filename[1] + '/' + date + '.csv'))
 
 
@@ -35,23 +41,26 @@ def xlsx_to_csv_minutes(file, filename):
 def whole_day_ratings(file, stations, data_type='style'):
     # Reads ratings for the entire day out of .csv files.
     # Gets input as list of locs from dictionary of station names
-    hl_averages = [16, 29, 42, 55, 60, 73, 78, 91, 100, 105]
+    hl_averages = ['Whole day']
     if data_type == 'style':
-        stations.insert(0, 'Timebands')
-        csv = pd.read_csv(file).loc[:, stations]
+        # stations.insert(0, 'Timebands')
+        csv = pd.read_csv(file, index_col=0).loc[:, stations]
         return csv.style.apply(lambda x: ['color: red' if x.name in hl_averages else '' for i in x],
-                               axis=1).format(precision=2)
+                               axis=1).format(precision=2).background_gradient()
+
     elif data_type == 'graph':
-        csv = pd.read_csv(file, skiprows=[17, 30, 43, 56, 61, 74, 79, 92, 101, 106, 107]).loc[:, stations]
+        csv = pd.read_csv(file, index_col=0, skiprows=[17, 30, 43, 56, 61, 74, 79, 92, 101, 106, 107]).loc[:, stations]
         return csv
     elif data_type == 'raw':
-        csv = pd.read_csv(file).loc[:, stations]
+        csv = pd.read_csv(file, index_col=0).loc[:, stations]
         return csv
 
 
 def slot_ratings(file, time_slots, stations):
     # stations.insert(0, 1)
-    hl_averages = [16, 29, 42, 55, 60, 73, 78, 91, 100, 105, 106]
+    hl_averages = ['>>> 2:00 - 6:00', '>>> 6:00 - 9:00', '>>> 9:00 - 12:00', '>>> 12:00 - 15:00', '>>> 15:00 - 16:00'
+                   '>>> 16:00 - 19:00', '>>> 19:00 - 20:00','>>> 20:00 - 23:00', '>>> 23:00 - 25:00',
+                   '>>> 25:00 - 26:00', 'Whole day']
     for slot in libraries.digi24_slots:
         if slot['tronson'] == time_slots:
             slot_position = slot.get('loc_q')
