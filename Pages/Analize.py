@@ -1,4 +1,6 @@
 import datetime
+
+import numpy
 import pandas as pd
 import streamlit as st
 import pathlib
@@ -13,34 +15,42 @@ with weekly_chart:
     select_year = st.selectbox('Alege anul', [int(datetime.date.today().year)])
     select_month = st.selectbox('Alege luna', calendar.month_name)
 
-    def first_monday(year=select_year, month=datetime.datetime.strptime(select_month, '%B').date().month):
-        # Creates list from calander with 4/5 weeks per month beginning with the first Monday in selected month,
-        # containing only Mondays through Thursdays. Extends into next month if last Monday in month is in
-        # selected month
-        week_days = []
-        local_calendar = calendar.Calendar().monthdatescalendar(year, month)
-        first_monday_in_month = (8 - datetime.date(year, month, 1).weekday()) % 7  # returns datetime
-        for local_week in local_calendar:  # Parses through month and starts list from first monday, selects M-Ts
-            for day in local_week:
-                if day >= datetime.date(year, month, first_monday_in_month) and day.weekday() < 4:
-                    week_days.append(day)
-        return week_days
+    try:
+        def first_monday(year=select_year, month=datetime.datetime.strptime(select_month, '%B').date().month):
+            # Creates list from calander with 4/5 weeks per month beginning with the first Monday in selected month,
+            # containing only Mondays through Thursdays. Extends into next month if last Monday in month is in
+            # selected month
+            week_days = []
+            local_calendar = calendar.Calendar().monthdatescalendar(year, month)
+            first_monday_in_month = (8 - datetime.date(year, month, 1).weekday()) % 7  # returns datetime
+            for local_week in local_calendar:  # Parses through month and starts list from first monday, selects M-Ts
+                for day in local_week:
+                    if day >= datetime.date(year, month, first_monday_in_month) and day.weekday() < 4:
+                        week_days.append(day)
+            return week_days
 
 
-    # Creates lists of weeks with 4 days
-    week_list = [first_monday()[i:i + 4] for i in range(0, len(first_monday()), 4)]
+        # Creates lists of weeks with 4 days
+        week_list = [first_monday()[i:i + 4] for i in range(0, len(first_monday()), 4)]
 
-    select_week = st.selectbox("Alege săptămâna", week_list,
-                               format_func=lambda x: f"{datetime.datetime.strftime(x[0], '%d %b')} "
-                                                     f"- {datetime.datetime.strftime(x[3], '%d %b')}")
+        select_week = st.selectbox("Alege săptămâna", week_list,
+                                   format_func=lambda x: f"{datetime.datetime.strftime(x[0], '%d %b')} "
+                                                         f"- {datetime.datetime.strftime(x[3], '%d %b')}")
+    except ValueError or NameError:
+        pass
     all_data = []
-    for selected_days in select_week:
-        rating_file = pathlib.Path(f"Data/Quarters/{selected_days.strftime('%Y/%m')}/"
-                                   f"{selected_days.strftime('%Y-%m-%d')}.csv")
-        df = data.whole_day_ratings(rating_file, ['Digi 24'], data_type='raw')
-        all_data.append(df.loc['Whole day', 'Digi 24'])
+    try:
+        for selected_days in select_week:
+            rating_file = pathlib.Path(f"Data/Quarters/{selected_days.strftime('%Y/%m')}/"
+                                       f"{selected_days.strftime('%Y-%m-%d')}.csv")
+            df = data.whole_day_ratings(rating_file, ['Digi 24'], data_type='raw')
+            all_data.append(df.loc['Whole day', 'Digi 24'])
 
-    st.write(f"Media săptămânii a fost {(sum(all_data))/len(all_data)}")
+        st.write(f"Media săptămânii a fost de {numpy.around((sum(all_data))/len(all_data), 2)}.")
+    except FileNotFoundError:
+        st.info(errors.no_rating_week)
+    except NameError:
+        pass
 
 with compare_day:
     selected_day = st.date_input('Alege audiențele din...', key='date_1_select')
