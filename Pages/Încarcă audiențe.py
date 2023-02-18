@@ -6,16 +6,11 @@ try:
 
     for file in my_file:
         file_name = file.name
-        if 'minut' in file_name:
-            data.xlsx_to_csv_minutes(file, file.name)
-            if data.xlsx_to_csv_minutes(file, file.name) is False:
-                st.error(f"Fişierul {file_name} are o problemă de layout. "
-                         "Verifică poziția Antenei 3. FIȘIERUL NU A FOST SALVAT")
-        else:
-            data.xlsx_to_csv_quarters(file, file.name)
-            if data.xlsx_to_csv_quarters(file, file.name) is False:
-                st.error(f"Fișierul {file_name} are o problemă de layout. "
-                         "Verifică poziția Antenei 3. FIȘIERUL NU A FOST SALVAT")
+        print(file_name)
+        data.xlsx_to_csv(file, file.name)
+        if data.xlsx_to_csv(file, file.name) is False:
+            st.error(f"Fişierul {file_name} are o problemă de layout. "
+                     f"Verifică poziția Antenei 3. FIȘIERUL NU A FOST SALVAT")
 
     if len(my_file) > 1:
         st.success("Fișierele au fost urcate cu succes!")
