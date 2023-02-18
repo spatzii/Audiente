@@ -64,7 +64,7 @@ with graph_slot:
     if time_slots == '2:00 - 6:00':
         st.info("Nu există audiențe la minut pentru intervalul 2:00 - 6:00")
     if len(active_stations_names) > 0 and time_slots != 'Selectează tronsonul ' and time_slots != '2:00 - 6:00':
-        st.line_chart(data.slot_ratings_for_graph_by_minute(minute_ratings, time_slots, active_stations_names),
+        st.line_chart(data.slot_ratings(minute_ratings, time_slots, active_stations_names, data_type='graph'),
                       x=None, y=active_stations_names)
 
 # for minute_file in minute_files:

@@ -39,7 +39,6 @@ def whole_day_ratings(file, stations, data_type='style'):
         csv = pd.read_csv(file, index_col=0).loc[:, stations]
         return csv.style.apply(lambda x: ['color: red' if x.name in hl_averages else '' for i in x],
                                axis=1).format(precision=2).background_gradient()
-
     elif data_type == 'graph':
         csv = pd.read_csv(file, index_col=0, skiprows=[17, 30, 43, 56, 61, 74, 79, 92, 101, 106, 107]).loc[:, stations]
         return csv
@@ -48,22 +47,21 @@ def whole_day_ratings(file, stations, data_type='style'):
         return csv
 
 
-def slot_ratings(file, time_slots, stations):
-    # stations.insert(0, 1)
+def slot_ratings(file, time_slots, stations, data_type='style'):
     hl_averages = []
     for slot in libraries.digi24_slots:
         if slot['tronson'] == time_slots:
-            slot_start = slot.get('start_q')
-            slot_end = slot.get('end_q')
-            csv = pd.read_csv(file, index_col=0).loc[slot_start:slot_end, stations]
-            return csv.style.apply(lambda x: ['color: red' if x.name in hl_averages else '' for i in x],
-                                   axis=1).format(precision=2).background_gradient()
+            if data_type == 'style':
+                slot_start = slot.get('start_q')
+                slot_end = slot.get('end_q')
+                csv = pd.read_csv(file, index_col=0).loc[slot_start:slot_end, stations]
+                return csv.style.apply(lambda x: ['color: red' if x.name in hl_averages else '' for i in x],
+                                       axis=1).format(precision=2).background_gradient()
+            elif data_type == 'graph':
+                slot_start = slot.get('start_m')
+                slot_end = slot.get('end_m')
+                csv = pd.read_csv(file, index_col=0).loc[slot_start: slot_end, stations]
+                return csv.style.format(precision=2)
 
 
-def slot_ratings_for_graph_by_minute(file, time_slots, stations):
-    for slot in libraries.digi24_slots:
-        if slot['tronson'] == time_slots:
-            slot_start = slot.get('start_m')
-            slot_end = slot.get('end_m')
-            csv = pd.read_csv(file, index_col=0).loc[slot_start: slot_end, stations]
-            return csv.style.format(precision=2)
+
