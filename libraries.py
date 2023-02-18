@@ -1,17 +1,21 @@
-import pathlib
-import datetime
-# {'tronson': 'Studio Politic', 'loc_q': list(range(56, 61)), 'loc_m': list(range(540, 600))}
-
 digi24_slots = [{'tronson': "Selectează tronsonul ", 'value': 'dummy'},
-                {'tronson': '2:00 - 6:00', 'loc_q': list(range(0, 17))},
-                {'tronson': '6-9 Matinal', 'loc_q': list(range(17, 30)), 'loc_m': list(range(0, 180))},
-                {'tronson': '9-12 Știrile Dimineții', 'loc_q': list(range(30, 43)), 'loc_m': list(range(180, 360))},
-                {'tronson': '12-15 Știrile Amiezii', 'loc_q': list(range(43, 56)), 'loc_m': list(range(360, 540))},
-                {'tronson': 'Studio Politic', 'loc_q': list(range(56, 61)), 'loc_m': list(range(540, 600))},
-                {'tronson': '16-19 Știrile Zilei', 'loc_q': list(range(61, 74)), 'loc_m': list(range(600, 780))},
-                {'tronson': 'Business Club', 'loc_q': list(range(74, 79)), 'loc_m': list(range(780, 840))},
-                {'tronson': 'Jurnalul de Seară', 'loc_q': list(range(79, 92)), 'loc_m': list(range(840, 1020))},
-                {'tronson': '23:00 Știrile Serii', 'loc_q': list(range(92, 106)), 'loc_m': list(range(1020, 1140))}]
+                {'tronson': '2:00 - 6:00', 'start_q': '02:00 - 02:15', 'end_q': 'Medie 2-6'},
+                {'tronson': '6-8 Matinal',
+                 'start_q': '06:00 - 06:15', 'end_q': 'Medie 6-9', 'start_m': '06:00', 'end_m': '08:59'},
+                {'tronson': '9-11 Știrile Dimineții',
+                 'start_q': '09:00 - 09:15', 'end_q': 'Medie 9-12', 'start_m': '09:00', 'end_m': '11:59'},
+                {'tronson': '12-14 Știrile Amiezii',
+                 'start_q': '12:00 - 12:15', 'end_q': 'Medie 12-15', 'start_m': '12:00', 'end_m': '14:59'},
+                {'tronson': 'Studio Politic',
+                 'start_q': '15:00 - 15:15', 'end_q': 'Medie 15-16', 'start_m': '15:00', 'end_m': '15:59'},
+                {'tronson': '16-18 Știrile Zilei',
+                 'start_q': '16:00 - 16:15', 'end_q': 'Medie 16-19', 'start_m': '16:00', 'end_m': '18:59'},
+                {'tronson': 'Business Club',
+                 'start_q': '19:00 - 19:15', 'end_q': 'Medie 19-20', 'start_m': '19:00', 'end_m': '19:59'},
+                {'tronson': 'Jurnalul de Seară',
+                 'start_q': '20:00 - 20:15', 'end_q': 'Medie 20-23', 'start_m': '20:00', 'end_m': '22:59'},
+                {'tronson': '23:00 Știrile Serii',
+                 'start_q': '23:00 - 23:15', 'end_q': 'Medie 23-25', 'start_m': '23:00', 'end_m': '24:59'}]
 
 digi24_slot_names = [x.get('tronson') for x in digi24_slots]
 

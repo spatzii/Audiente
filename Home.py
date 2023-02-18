@@ -36,7 +36,7 @@ with ratings_whole_day:
     if len(active_stations_names) == 0 and quarter_ratings.exists():
         st.info(errors.choose_station)
     if len(active_stations_names) > 0:
-        st.dataframe(data.whole_day_ratings(quarter_ratings, active_stations_names))
+        st.dataframe(data.whole_day_ratings(quarter_ratings, active_stations_names), use_container_width=True)
 with graph_all_day:
     if len(active_stations_names) == 0 and quarter_ratings:
         st.info(errors.choose_station)
@@ -54,7 +54,7 @@ with ratings_slot:
     if time_slots == 'Selectează tronsonul ' and len(active_stations_names) > 0:
         st.info(errors.choose_slot)
     if len(active_stations_names) > 0 and time_slots != 'Selectează tronsonul ':
-        st.dataframe(data.slot_ratings(quarter_ratings, time_slots, active_stations_names))
+        st.dataframe(data.slot_ratings(quarter_ratings, time_slots, active_stations_names), use_container_width=True)
 
 with graph_slot:
     if len(active_stations_names) == 0 and quarter_ratings:
