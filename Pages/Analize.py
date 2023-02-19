@@ -8,8 +8,7 @@ import data
 import errors
 import calendar
 
-
-weekly_chart, compare_day = st.tabs(['Rapoarte săptămânale', 'Comparație zile'])
+weekly_chart, monthly_chart, compare_day = st.tabs(['Rapoarte săptămânale', 'Rapoarte lunare', 'Comparație zile'])
 
 with weekly_chart:
     select_year = st.selectbox('Alege anul', [int(datetime.date.today().year)])
@@ -46,11 +45,26 @@ with weekly_chart:
             df = data.whole_day_ratings(rating_file, ['Digi 24'], data_type='raw')
             all_data.append(df.loc['Whole day', 'Digi 24'])
 
-        st.write(f"Media săptămânii a fost de {numpy.around((sum(all_data))/len(all_data), 2)}.")
+        st.write(f"Media săptămânii a fost de {numpy.around((sum(all_data)) / len(all_data), 2)}.")
     except FileNotFoundError:
         st.info(errors.no_rating_week)
     except NameError:
         pass
+
+with monthly_chart:
+    select_year = st.selectbox('Alege anul', [int(datetime.date.today().year)], key='monthly_y')
+    select_month = st.selectbox('Alege luna', calendar.month_name, key='monthly_m')
+    file_location = f"/Users/stefanpana/PycharmProjects/Audiente/Data/Quarters/{str(select_year)}/" \
+                    f"{str(datetime.datetime.strptime(select_month, '%B').date().month).zfill(2)}"
+    whole_day_ratings = []
+    whole_day_days = []
+    for file in pathlib.Path(file_location).glob('*.csv'):
+        whole_day = data.whole_day_ratings(file, 'Digi 24', data_type='raw').loc['Whole day']
+        whole_day_ratings.append(whole_day)
+        whole_day_days.append(datetime.datetime.strptime(file.stem, '%Y-%m-%d').day)
+
+    st.line_chart(whole_day_ratings, x=None, y=whole_day_days.sort())
+    st.dataframe(whole_day_ratings)
 
 with compare_day:
     selected_day = st.date_input('Alege audiențele din...', key='date_1_select')
