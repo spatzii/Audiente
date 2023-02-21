@@ -6,7 +6,6 @@ try:
 
     for file in my_file:
         file_name = file.name
-        print(file_name)
         data.xlsx_to_csv(file, file.name)
         if data.xlsx_to_csv(file, file.name) is False:
             st.error(f"Fişierul {file_name} are o problemă de layout. "

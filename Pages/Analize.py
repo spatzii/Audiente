@@ -66,6 +66,7 @@ with monthly_chart:
     st.line_chart(whole_day_ratings, x=None, y=whole_day_days.sort())
     st.dataframe(whole_day_ratings)
 
+
 with compare_day:
     selected_day = st.date_input('Alege audiențele din...', key='date_1_select')
     day_one = pathlib.Path(f"Data/Quarters/{selected_day.strftime('%Y/%m')}/{selected_day.strftime('%Y-%m-%d')}.csv")
