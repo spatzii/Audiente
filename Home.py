@@ -5,6 +5,7 @@ import libraries
 import errors
 import datetime
 
+st.image('logo_digi.jpg', width=280)
 st.title("Audiențe Digi24")
 
 selection = st.date_input('Selectează data audiențelor...', key='date_select')
