@@ -1,6 +1,7 @@
 import pandas as pd
 import pathlib
 import libraries
+import classes as cls
 
 
 def clean_data(file):
@@ -37,35 +38,20 @@ def xlsx_to_csv(file, filename):
             pathlib.Path('Data/Minutes/' + date[0] + '/' + date[1] + '/' + filename.rstrip('.xlsx')[-10:] + '.csv'))
 
 
-def whole_day_ratings(file, stations, data_type='style'):
-    # Reads ratings for the entire day out of .csv files.
-    # Gets input as list of locs from dictionary of station names
-    hl_averages = ['Whole day']
-    if data_type == 'style':
-        # stations.insert(0, 'Timebands')
-        csv = pd.read_csv(file, index_col=0).loc[:, stations]
-        return csv.style.apply(lambda x: ['color: red' if x.name in hl_averages else '' for i in x],
-                               axis=1).format(precision=2).background_gradient()
-    elif data_type == 'graph':
-        csv = pd.read_csv(file, index_col=0, skiprows=[17, 30, 43, 56, 61, 74, 79, 92, 101, 106, 107]).loc[:, stations]
-        return csv
-    elif data_type == 'raw':
-        csv = pd.read_csv(file, index_col=0).loc[:, stations]
-        return csv
+def tables_whole_day(csv, stations):
+    return pd.concat([cls.Channel(csv, station).get_rating_day() for station in stations],
+                     axis=1).style.format(precision=2).background_gradient()
 
 
-def slot_ratings(file, time_slots, stations, data_type='style'):
-    hl_averages = []
-    for slot in libraries.digi24_slots:
-        if slot['tronson'] == time_slots:
-            if data_type == 'style':
-                slot_start = slot.get('start_q')
-                slot_end = slot.get('end_q')
-                csv = pd.read_csv(file, index_col=0).loc[slot_start:slot_end, stations]
-                return csv.style.apply(lambda x: ['color: red' if x.name in hl_averages else '' for i in x],
-                                       axis=1).format(precision=2).background_gradient()
-            elif data_type == 'graph':
-                slot_start = slot.get('start_m')
-                slot_end = slot.get('end_m')
-                csv = pd.read_csv(file, index_col=0).loc[slot_start: slot_end, stations]
-                return csv.style.format(precision=2)
+def graphs_whole_day(csv, stations):
+    return pd.concat([cls.Channel(csv, station).get_graph_day() for station in stations], axis=1)
+
+
+def tables_slot(csv, stations, timeslot):
+    return pd.concat([cls.Channel(csv, station).get_rating_slot(timeslot) for station in stations],
+                     axis=1).style.format(precision=2).background_gradient()
+
+
+def graphs_slot(csv, stations, timeslot):
+    return pd.concat([cls.Channel(csv, station).get_graph_slot(timeslot) for station in stations], axis=1)
+
