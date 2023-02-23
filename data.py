@@ -23,10 +23,9 @@ def xlsx_to_csv(file, filename):
     if len(filename) == 40:
         pathlib.Path('Data/Quarters/' + date[0] + '/' + date[1]).mkdir(parents=True, exist_ok=True)
         rating_file = pd.read_excel(file, sheet_name=1,
-                                    skiprows=[0, 1, 1143]).set_index('Timebands').loc[:, ['Digi 24.1',
+                                    skiprows=[0, 1, 1143]).set_index('Timebands').loc[:, ['TTV.1', 'Digi 24.1',
                                                                                           'Antena 3 CNN.1',
-                                                                                          'B1TV.1',
-                                                                                          'EuroNews.1',
+                                                                                          'B1TV.1', 'EuroNews.1',
                                                                                           'Realitatea Plus.1',
                                                                                           'Romania TV.1']]
         clean_data(rating_file)
@@ -60,5 +59,15 @@ def graphs_slot(csv, stations, timeslot):
     return pd.concat([cls.Channel(csv, station).get_graph_slot(timeslot) for station in stations], axis=1)
 
 
-def whole_day_raw(csv, location, stations):
-    return cls.Channel(csv, stations).get_rating_data(location)
+def get_row_value(csv, station, row):
+    return cls.Channel(csv, station).get_raw(row).values[0]
+
+
+def adjusted_share(csv):
+    whole_days_list = []
+    for channel in libraries.all_channels:
+        whole_days_list.append(cls.Analyzer(csv, channel.get('tv')).get_whole_day_rating())
+    return sum(whole_days_list)
+
+
+

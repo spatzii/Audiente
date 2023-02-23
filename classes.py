@@ -1,4 +1,7 @@
+import numpy
 import pandas as pd
+import data
+import libraries
 import libraries as lb
 import pathlib
 
@@ -29,16 +32,22 @@ class Channel:
                 slot_end = slot.get('end_m')
                 return pd.read_csv(self.file, index_col=0).loc[slot_start:slot_end, self.name]
 
-    def get_rating_data(self, location):
-        print(pd.read_csv(self.file, index_col=0).loc[location, self.name])
-        return pd.read_csv(self.file, index_col=0).loc[location, self.name]
+    def get_raw(self, loc_index):
+        return pd.read_csv(self.file, index_col=0).loc[loc_index:, self.name]
 
 
-class Dataframe:
-    def __init__(self, channels):
-        self.channels = channels
+class Analyzer(Channel):
+    def get_whole_day_rating(self):
+        return Channel(self.file, self.name).get_raw('Whole day').values[0]
 
-    def dataframe(self):
-        return pd.concat(self.channels, axis=1)
+    def get_share(self):
+        whole_day_rating = Analyzer.get_whole_day_rating(self)
+        share_raw = Channel(self.file, channel_name='TTV').get_raw('Whole day').values[0]
+        return numpy.around((whole_day_rating / share_raw * 100), 2)
+
+    def adjusted_share(self):
+        total_news_share = data.adjusted_share(self.file)
+        return numpy.around((Analyzer.get_whole_day_rating(self) / total_news_share * 100), 1)
+
 
 

@@ -1,5 +1,6 @@
 import datetime
 
+import classes
 import libraries
 import numpy
 import pandas as pd
@@ -44,8 +45,8 @@ with weekly_chart:
         for selected_days in select_week:
             rating_file = pathlib.Path(f"Data/Quarters/{selected_days.strftime('%Y/%m')}/"
                                        f"{selected_days.strftime('%Y-%m-%d')}.csv")
-            df = data.whole_day_raw(rating_file, ['Digi 24'])
-            all_data.append(df.loc['Whole day', 'Digi 24'])
+            df = classes.Channel(rating_file, 'Digi24').get_raw('Whole day')
+            all_data.append(df.loc['Whole day'])
 
         st.write(f"Media săptămânii a fost de {numpy.around((sum(all_data)) / len(all_data), 2)}.")
     except FileNotFoundError:
