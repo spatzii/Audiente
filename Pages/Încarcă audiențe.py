@@ -2,7 +2,7 @@ import data
 import streamlit as st
 
 try:
-    my_file = st.file_uploader('Select a file...', type='xlsx', key='upload', accept_multiple_files=True)
+    my_file = st.file_uploader('Alege fisierele...', type=['xlsx', 'zip'], key='upload', accept_multiple_files=True)
 
     for file in my_file:
         file_name = file.name

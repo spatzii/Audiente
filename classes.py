@@ -29,6 +29,10 @@ class Channel:
                 slot_end = slot.get('end_m')
                 return pd.read_csv(self.file, index_col=0).loc[slot_start:slot_end, self.name]
 
+    def get_rating_data(self, location):
+        print(pd.read_csv(self.file, index_col=0).loc[location, self.name])
+        return pd.read_csv(self.file, index_col=0).loc[location, self.name]
+
 
 class Dataframe:
     def __init__(self, channels):

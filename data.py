@@ -7,7 +7,6 @@ import classes as cls
 def clean_data(file):
     file.columns = file.columns.str.replace('.1', '', regex=False)
     for avg_index in file.index:
-        print('found')
         if '>>>' in avg_index:
             index_without_symbols = avg_index.rpartition(">>> ")
             slot_avg = str(index_without_symbols[2]).replace(':00', '').replace(" ", '')
@@ -24,7 +23,12 @@ def xlsx_to_csv(file, filename):
     if len(filename) == 40:
         pathlib.Path('Data/Quarters/' + date[0] + '/' + date[1]).mkdir(parents=True, exist_ok=True)
         rating_file = pd.read_excel(file, sheet_name=1,
-                                    skiprows=[0, 1, 1143]).set_index('Timebands').iloc[:, [17, 20, 21, 23, 27, 28]]
+                                    skiprows=[0, 1, 1143]).set_index('Timebands').loc[:, ['Digi 24.1',
+                                                                                          'Antena 3 CNN.1',
+                                                                                          'B1TV.1',
+                                                                                          'EuroNews.1',
+                                                                                          'Realitatea Plus.1',
+                                                                                          'Romania TV.1']]
         clean_data(rating_file)
         rating_file.to_csv(
             pathlib.Path('Data/Quarters/' + date[0] + '/' + date[1] + '/' + filename.rstrip('.xlsx')[-10:] + '.csv'))
@@ -55,3 +59,6 @@ def tables_slot(csv, stations, timeslot):
 def graphs_slot(csv, stations, timeslot):
     return pd.concat([cls.Channel(csv, station).get_graph_slot(timeslot) for station in stations], axis=1)
 
+
+def whole_day_raw(csv, location, stations):
+    return cls.Channel(csv, stations).get_rating_data(location)
