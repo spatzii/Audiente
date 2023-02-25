@@ -38,16 +38,39 @@ class Channel:
 
 class Analyzer(Channel):
     def get_whole_day_rating(self):
+        # Whole day rating for channel in a particular day
         return Channel(self.file, self.name).get_raw('Whole day').values[0]
 
-    def get_share(self):
-        whole_day_rating = Analyzer.get_whole_day_rating(self)
-        share_raw = Channel(self.file, channel_name='TTV').get_raw('Whole day').values[0]
-        return numpy.around((whole_day_rating / share_raw * 100), 2)
+    def get_monthly_average(self):
+        # Average of whole day ratings by current month for channel. Will be LAST 30 DAYS
+        file_year = data.get_date_from_rtg(Channel(self.file, self.name).file).year
+        file_month = data.get_date_from_rtg(Channel(self.file, self.name).file).month
+        file_location = f"/Users/stefanpana/PycharmProjects/Audiente/Data/Quarters/{file_year}/{str(file_month).zfill(2)}"
+        whole_day_ratings_list = []
+        for self.file in pathlib.Path(file_location).glob('*.csv'):
+            whole_day = pd.read_csv(self.file, index_col=0).loc['Whole day', self.name]
+            whole_day_ratings_list.append(whole_day)
+        return numpy.around(sum(whole_day_ratings_list) / len(whole_day_ratings_list), 2)
+
+    def daily_rtg_relative_change(self):
+        # Percentage change in +/- on daily rating compared to monthly average
+        return numpy.around(((Analyzer(self.file, self.name).get_whole_day_rating() -
+                             Analyzer(self.file, self.name).get_monthly_average()) /
+                             Analyzer(self.file, self.name).get_monthly_average() * 100), 1)
+    # def get_share(self):
+    #     # Channel's share of rating out of all the externally monitored channels
+    #     whole_day_rating = Analyzer.get_whole_day_rating(self)
+    #     share_raw = Channel(self.file, channel_name='TTV').get_raw('Whole day').values[0]
+    #     return numpy.around((whole_day_rating / share_raw * 100), 2)
 
     def adjusted_share(self):
+        # Channel's share of rating from the sum of RELEVANT channels' share (only news channels)
         total_news_share = data.adjusted_share(self.file)
         return numpy.around((Analyzer.get_whole_day_rating(self) / total_news_share * 100), 1)
+
+
+
+
 
 
 
