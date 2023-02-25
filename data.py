@@ -53,7 +53,7 @@ def get_date_from_rtg(file):
 
 def tables_whole_day(csv, stations):
     return pd.concat([cls.Channel(csv, station).get_rating_day() for station in stations],
-                     axis=1).style.format(precision=2).background_gradient()
+                     axis=1)
 
 
 def graphs_whole_day(csv, stations):
@@ -62,7 +62,7 @@ def graphs_whole_day(csv, stations):
 
 def tables_slot(csv, stations, timeslot):
     return pd.concat([cls.Channel(csv, station).get_rating_slot(timeslot) for station in stations],
-                     axis=1).style.format(precision=2).background_gradient()
+                     axis=1)
 
 
 def graphs_slot(csv, stations, timeslot):

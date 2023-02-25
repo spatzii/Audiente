@@ -22,6 +22,8 @@ digi24_slot_names = [x.get('tronson') for x in digi24_slots]
 all_channels = [{'tv': 'Digi 24'}, {'tv': 'Antena 3 CNN'}, {'tv': 'B1TV'},
                 {'tv': 'EuroNews'}, {'tv': 'Realitatea Plus'}, {'tv': 'Romania TV'}]
 
+px_color_map = {'Digi 24': 'magenta', 'Antena 3 CNN': 'blue', 'B1TV': 'orange',
+                'EuroNews': 'cyan', 'Realitatea Plus': 'red', 'Romania TV': 'green'}
 
 
 
