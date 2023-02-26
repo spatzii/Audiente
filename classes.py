@@ -4,6 +4,61 @@ import data
 import libraries
 import libraries as lb
 import pathlib
+import datetime
+
+
+class CSVWriter:
+    def __init__(self, file, filename):
+        self.file = file
+        self.filename = filename.rstrip('.xlsx')[-10:].split("-")
+        self.date = datetime.datetime.strptime(filename.rstrip('.xlsx')[-10:], '%Y-%m-%d')
+
+    def check_date(self):
+        if self.date.weekday() < 4:
+            CSVWriter.weekday(self)
+        if self.date.weekday() == 4:
+            CSVWriter.friday(self)
+
+    @staticmethod
+    def clean_data(raw_file):
+        raw_file.columns = raw_file.columns.str.replace('.1', '', regex=False)
+        for avg_index in raw_file.index:
+            if '>>>' in avg_index:
+                index_without_symbols = avg_index.rpartition(">>> ")
+                slot_avg = str(index_without_symbols[2]).replace(':00', '').replace(" ", '')
+                raw_file.rename(index={avg_index: f'Medie {slot_avg}'}, inplace=True)
+        return raw_file
+
+    def weekday(self):
+        if len(self.file.name) == 40:  # Quarters
+            pathlib.Path('Data/Quarters/' + self.filename[0] + '/'
+                         + self.filename[1]).mkdir(parents=True, exist_ok=True)
+            rating_file = pd.read_excel(self.file, sheet_name=1,
+                                        skiprows=[0, 1, 1143]).set_index('Timebands').loc[:, ['TTV.1', 'Digi 24.1',
+                                                                                              'Antena 3 CNN.1',
+                                                                                              'B1TV.1', 'EuroNews.1',
+                                                                                              'Realitatea Plus.1',
+                                                                                              'Romania TV.1']]
+
+            CSVWriter.clean_data(rating_file).to_csv(pathlib.Path('Data/Quarters/' +
+                                                                  self.filename[0] + '/' + self.filename[1] + '/' +
+                                                                  self.file.name.rstrip('.xlsx')[-10:] + '.csv'))
+
+        elif len(self.file.name) == 49:  # Minutes
+            pathlib.Path('Data/Minutes/' + self.filename[0] + '/' + self.filename[1]).mkdir(parents=True, exist_ok=True)
+            rating_file = pd.read_excel(self.file, sheet_name=3,
+                                        skiprows=[0, 1, 1143]).set_index('Timebands').loc[:, ['Digi 24.1',
+                                                                                              'Antena 3 CNN.1',
+                                                                                              'B1TV.1', 'EuroNews.1',
+                                                                                              'Realitatea Plus.1',
+                                                                                              'Romania TV.1']]
+            CSVWriter.clean_data(rating_file)
+            rating_file.to_csv(
+                pathlib.Path('Data/Minutes/' + self.filename[0] + '/' + self.filename[1] +
+                             '/' + self.file.name.rstrip('.xlsx')[-10:] + '.csv'))
+
+    def friday(self):
+        pass
 
 
 class Channel:

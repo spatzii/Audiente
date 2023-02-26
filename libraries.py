@@ -17,6 +17,19 @@ digi24_slots = [{'tronson': "Selectează tronsonul ", 'value': 'dummy'},
                 {'tronson': '23:00 Știrile Serii',
                  'start_q': '23:00 - 23:15', 'end_q': 'Medie 23-25', 'start_m': '23:00', 'end_m': '24:59'}]
 
+digi24_saturday = [{'tronson': "Selectează tronsonul ", 'value': 'dummy'},
+                   {'tronson': '2:00 - 6:00', 'start_q': '02:00 - 02:15', 'end_q': 'Medie 2-6'},
+                   {'tronson': '6-9 Matinal', 'start_q': '06:00 - 06:15', 'end_q': '09:45 - 10:00',
+                    'start_m': '06:00', 'end_m': '9:59'},
+                   {'tronson': '10-13 Știrile Dimineții', 'start_q': '10:00 - 10:15', 'end_q': '13:45 - 40:00',
+                    'start_m': '09:00', 'end_m': '13:59'},
+                   {'tronson': 'În fața ta', 'start_q': '14:00 - 14:15', 'end_q': '14:45 - 15:00',
+                    'start_m': '14:00', 'end_m': "14:59"},
+                   {'tronson': "Știrile Zilei", 'start_q': '15:00 - 15:15', 'end_q': '19:45 - 20:00',
+                    'start_m': '16:00', 'end_m': '18:59'},
+                   {'tronson': 'Știrile serii', 'start_q': '20:00 - 20:15', 'end_q': '24:45 - 25:00',
+                    'start_m': '20:00', 'end_m': '24:59'}]
+
 digi24_slot_names = [x.get('tronson') for x in digi24_slots]
 
 all_channels = [{'tv': 'Digi 24'}, {'tv': 'Antena 3 CNN'}, {'tv': 'B1TV'},

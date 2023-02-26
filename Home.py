@@ -52,8 +52,10 @@ with ratings_whole_day:
     if len(active_stations) == 0 and quarters_file.exists():
         st.info(errors.choose_station)
     if len(active_stations) > 0:
-        rwh = st.dataframe(data.tables_whole_day(quarters_file, active_stations),
-                           use_container_width=True)
+        rwh = \
+            st.dataframe(data.tables_whole_day(quarters_file, active_stations)
+                         .style.background_gradient().set_precision(2),
+                         use_container_width=True)
 
 with graph_all_day:
     if len(active_stations) == 0 and quarters_file:
@@ -73,7 +75,8 @@ with ratings_slot:
     if time_slots == 'Selectează tronsonul ' and len(active_stations) > 0:
         st.info(errors.choose_slot)
     if len(active_stations) > 0 and time_slots != 'Selectează tronsonul ':
-        rs = st.dataframe(data.tables_slot(quarters_file, active_stations, time_slots), use_container_width=True)
+        rs = st.dataframe(data.tables_slot(quarters_file, active_stations, time_slots).
+                          style.background_gradient().set_precision(2), use_container_width=True)
 
 with graph_slot:
     if len(active_stations) == 0 and quarters_file:
