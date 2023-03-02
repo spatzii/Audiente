@@ -53,7 +53,7 @@ class Channel:
         self.name = channel_name
 
     def get_rating_day(self):
-        return pd.read_csv(self.file, index_col=0).loc[:, self.name]
+        return pd.read_csv(self.file, index_col=0).loc['02:00 - 02:15':'Whole day', self.name]
 
     def get_rating_slot(self, timeslot):
         for slot in lb.digi24_slots:
@@ -63,8 +63,7 @@ class Channel:
                 return pd.read_csv(self.file, index_col=0).loc[slot_start:slot_end, self.name]
 
     def get_graph_day(self):
-        return pd.read_csv(self.file, index_col=0,
-                           skiprows=[17, 30, 43, 56, 61, 74, 79, 92, 101, 106, 107]).loc[:, self.name]
+        return pd.read_csv(self.file, index_col=0).loc['02:00 - 02:15':'25:45 - 26:00', self.name]
 
     def get_graph_slot(self, timeslot):
         for slot in lb.digi24_slots:
@@ -86,7 +85,7 @@ class Analyzer(Channel):
         # Average of whole day ratings by current month for channel. Will be LAST 30 DAYS
         file_year = data.get_date_from_rtg(Channel(self.file, self.name).file).year
         file_month = data.get_date_from_rtg(Channel(self.file, self.name).file).month
-        file_location = f"/Users/stefanpana/PycharmProjects/Audiente/Data/Quarters/{file_year}/{str(file_month).zfill(2)}"
+        file_location = f"/Users/stefanpana/PycharmProjects/Audiente/Data/Complete/{file_year}/{str(file_month).zfill(2)}"
         whole_day_ratings_list = []
         for self.file in pathlib.Path(file_location).glob('*.csv'):
             whole_day = pd.read_csv(self.file, index_col=0).loc['Whole day', self.name]
