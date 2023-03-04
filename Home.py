@@ -14,16 +14,13 @@ with col_hdr:
     st.title("Audiențe Digi24")
 
 selection = st.date_input('Selectează data audiențelor...', key='date_select')
-
-quarters_file = pathlib.Path(f"Data/Quarters/{selection.strftime('%Y/%m')}/{selection.strftime('%Y-%m-%d')}.csv")
-minutes_file = pathlib.Path(f"Data/Minutes/{selection.strftime('%Y/%m')}/{selection.strftime('%Y-%m-%d')}.csv")
 rating_file = pathlib.Path(f"Data/Complete/{selection.strftime('%Y/%m')}/{selection.strftime('%Y-%m-%d')}.csv")
 
 at_a_glance, ratings_whole_day, graph_all_day, ratings_slot, graph_slot = st.tabs(['Date rapide',
                                                                                    'Audiențe whole day',
-                                                                                   'Rapoarte whole day',
-                                                                                   'Audiențe tronsoane',
-                                                                                   'Rapoarte tronsoane'])
+                                                                                   'Grafic whole day',
+                                                                                   'Audiențe tronson',
+                                                                                   'Grafic tronson'])
 
 checkbox = []
 active_stations = []
@@ -66,7 +63,7 @@ with graph_all_day:
 
 with ratings_slot:
     with st.sidebar:
-        time_slots = st.selectbox('Selectează tronsonul: ', libraries.digi24_slot_names,
+        time_slots = st.selectbox('Selectează tronsonul: ', data.channel_names(),
                                   key="tronson")
     if len(active_stations) == 0 and rating_file:
         st.info(errors.choose_station)

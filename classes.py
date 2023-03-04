@@ -8,6 +8,8 @@ import datetime
 
 
 class CSVWriter:
+    # Create and save one CSV from minutes and quarters ratings files
+
     def __init__(self, quarter, minute):
         self.quarter = quarter
         self.minute = minute
@@ -50,34 +52,43 @@ class CSVWriter:
 
 
 class Channel:
+    # Create daily tables and graphs from CSV file for selected
+    # TV station and calculate basic data for them
+
     def __init__(self, file, channel_name):
-        self.file = file
+        self.file = file  # Data/Complete/YYYY/MM/YYYY-MM-DD.csv
         self.name = channel_name
         self.csv = pd.read_csv(self.file, index_col=0)
 
     def get_rating_day(self):
         list_of_dataframes = []
-        for slot in libraries.digi24_slots:
+        for slot in DayOperations(self.file, self.name).weekday_interpreter():
             list_of_dataframes.append(pd.concat([self.csv.loc[slot.get('start_q'):slot.get('end_q'), [self.name]],
                                                  pd.DataFrame.from_dict({f"Medie {slot.get('tronson')}": self.csv.loc[
-                                                                             slot.get('start_q'):slot.get('end_q'),
-                                                                             [self.name]].mean()}, orient='index')]))
+                                                                                                         slot.get(
+                                                                                                             'start_q'):slot.get(
+                                                                                                             'end_q'),
+                                                                                                         [
+                                                                                                             self.name]].mean()},
+                                                                        orient='index')]))
+        list_of_dataframes.append(pd.DataFrame([self.csv.loc['Whole day', self.name]],
+                                               index=['Whole day'], columns=[self.name]))
         return np.around(pd.concat(list_of_dataframes), 2)
 
     def get_rating_slot(self, timeslot):
-        for slot in lb.digi24_slots:
+        for slot in lb.digi24_weekdays:
             if slot['tronson'] == timeslot:
                 slot_start = slot.get('start_q')
                 slot_end = slot.get('end_q')
                 return np.around(pd.concat([self.csv.loc[slot_start:slot_end, [self.name]],
-                                 pd.DataFrame.from_dict({f"Medie {slot.get('tronson')}": self.csv.loc
-                                           [slot_start:slot_end, [self.name]].mean()}, orient='index')]), 2)
+                                            pd.DataFrame.from_dict({f"Medie {slot.get('tronson')}": self.csv.loc
+                                            [slot_start:slot_end, [self.name]].mean()}, orient='index')]), 2)
 
     def get_graph_day(self):
         return self.csv.loc['02:00 - 02:15':'25:45 - 26:00', self.name]
 
     def get_graph_slot(self, timeslot):
-        for slot in lb.digi24_slots:
+        for slot in lb.digi24_weekdays:
             if slot['tronson'] == timeslot:
                 slot_start = slot.get('start_m')
                 slot_end = slot.get('end_m')
@@ -87,20 +98,24 @@ class Channel:
         return self.csv.loc[loc_index:, self.name]
 
     def get_slot_average(self, timeslot):
-        for slot in libraries.digi24_slots:
+        for slot in libraries.digi24_weekdays:
             if slot['tronson'] == timeslot:
                 return pd.DataFrame(self.csv.loc[slot.get('start_q'):slot.get('end_q'), self.name].mean()).T
 
 
 class Analyzer(Channel):
+    # Analyze complex data for TV stations with scope broader than 1-day
+
     def get_whole_day_rating(self):
         # Whole day rating for channel in a particular day
         return Channel(self.file, self.name).get_raw('Whole day').values[0]
 
     def get_monthly_average(self):
         # Average of whole day ratings by current month for channel. Will be LAST 30 DAYS
-        file_year = data.get_date_from_rtg(Channel(self.file, self.name).file).year
-        file_month = data.get_date_from_rtg(Channel(self.file, self.name).file).month
+        # file_year = data.get_date_from_rtg(Channel(self.file, self.name).file).year
+        # file_month = data.get_date_from_rtg(Channel(self.file, self.name).file).month
+        file_year = DayOperations(self.file, self.name).get_date_from_rtg().year
+        file_month = DayOperations(self.file, self.name).get_date_from_rtg().month
         file_location = f"/Users/stefanpana/PycharmProjects/Audiente/Data/Complete/{file_year}/{str(file_month).zfill(2)}"
         whole_day_ratings_list = []
         for self.file in pathlib.Path(file_location).glob('*.csv'):
@@ -114,13 +129,26 @@ class Analyzer(Channel):
                            Analyzer(self.file, self.name).get_monthly_average()) /
                           Analyzer(self.file, self.name).get_monthly_average() * 100), 1)
 
-    # def get_share(self):
-    #     # Channel's share of rating out of all the externally monitored channels
-    #     whole_day_rating = Analyzer.get_whole_day_rating(self)
-    #     share_raw = Channel(self.file, channel_name='TTV').get_raw('Whole day').values[0]
-    #     return numpy.around((whole_day_rating / share_raw * 100), 2)
-
     def adjusted_share(self):
         # Channel's share of rating from the sum of RELEVANT channels' share (only news channels)
         total_news_share = data.adjusted_share(self.file)
         return np.around((Analyzer.get_whole_day_rating(self) / total_news_share * 100), 1)
+
+
+class DayOperations(Channel):
+    # Datetime interpreter from CSV name
+    def get_date_from_rtg(self):
+        # Returns datetime obj from CSV file
+        return datetime.datetime.strptime(self.file.stem, '%Y-%m-%d').date()  # YYYY-MM-DD
+
+    def weekday_interpreter(self):
+        # Returns library location according to weekday (M-T/F/S/S)
+        current_day = DayOperations.get_date_from_rtg(self)
+        if current_day.weekday() <= 3:
+            return libraries.digi24_weekdays
+        if current_day.weekday() == 4:
+            return libraries.digi24_friday
+        if current_day.weekday() == 5:
+            return libraries.digi24_saturday
+        if current_day.weekday() == 6:
+            return libraries.digi24_sunday
