@@ -1,5 +1,4 @@
-digi24_slots = [{'tronson': "Selectează tronsonul ", 'value': 'dummy'},
-                {'tronson': '2:00 - 6:00', 'start_q': '02:00 - 02:15', 'end_q': 'Medie 2-6'},
+digi24_slots = [{'tronson': '2:00 - 6:00', 'start_q': '02:00 - 02:15', 'end_q': '05:45 - 06:00'},
                 {'tronson': '6-8 Matinal',
                  'start_q': '06:00 - 06:15', 'end_q': '08:45 - 09:00', 'start_m': '06:00', 'end_m': '08:59'},
                 {'tronson': '9-11 Știrile Dimineții',

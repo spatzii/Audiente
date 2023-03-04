@@ -4,6 +4,7 @@ import data
 import libraries
 import errors
 import classes as cls
+import pandas as pd
 import plotly.express as px
 
 col_img, col_hdr = st.columns(2)
@@ -18,20 +19,17 @@ quarters_file = pathlib.Path(f"Data/Quarters/{selection.strftime('%Y/%m')}/{sele
 minutes_file = pathlib.Path(f"Data/Minutes/{selection.strftime('%Y/%m')}/{selection.strftime('%Y-%m-%d')}.csv")
 rating_file = pathlib.Path(f"Data/Complete/{selection.strftime('%Y/%m')}/{selection.strftime('%Y-%m-%d')}.csv")
 
-
-at_a_glance, ratings_whole_day, graph_all_day, ratings_slot, graph_slot, plotly_test = st.tabs(['Date rapide',
-                                                                                                'Audiențe whole day',
-                                                                                                'Rapoarte whole day',
-                                                                                                'Audiențe tronsoane',
-                                                                                                'Rapoarte tronsoane',
-                                                                                                'Test plotly'])
+at_a_glance, ratings_whole_day, graph_all_day, ratings_slot, graph_slot = st.tabs(['Date rapide',
+                                                                                   'Audiențe whole day',
+                                                                                   'Rapoarte whole day',
+                                                                                   'Audiențe tronsoane',
+                                                                                   'Rapoarte tronsoane'])
 
 checkbox = []
 active_stations = []
 
 if rating_file.exists() is False:
     st.info(errors.no_rating_file)
-
 
 with st.sidebar:
     # A checkbox is created for every channel in the all_channels dict. If the checkbox is selected,
@@ -54,10 +52,9 @@ with ratings_whole_day:
     if len(active_stations) == 0 and rating_file.exists():
         st.info(errors.choose_station)
     if len(active_stations) > 0:
-        rwh = \
-            st.dataframe(data.tables_whole_day(rating_file, active_stations)
-                         .style.background_gradient().set_precision(2),
-                         use_container_width=True)
+        rwh = st.dataframe(data.tables_whole_day(rating_file, active_stations)
+                           .style.background_gradient().set_precision(2),
+                           use_container_width=True)
 
 with graph_all_day:
     if len(active_stations) == 0 and rating_file:
@@ -67,15 +64,12 @@ with graph_all_day:
         pltl_wh = px.line(ghd, x=ghd.index, y=active_stations, color_discrete_map=libraries.px_color_map)
         st.plotly_chart(pltl_wh)
 
-
 with ratings_slot:
     with st.sidebar:
-        time_slots = st.selectbox('Selectează tronsonul', libraries.digi24_slot_names,
-                                  key="tronson", label_visibility="hidden")
+        time_slots = st.selectbox('Selectează tronsonul: ', libraries.digi24_slot_names,
+                                  key="tronson")
     if len(active_stations) == 0 and rating_file:
         st.info(errors.choose_station)
-    if time_slots == 'Selectează tronsonul ' and len(active_stations) > 0:
-        st.info(errors.choose_slot)
     if len(active_stations) > 0 and time_slots != 'Selectează tronsonul ':
         rs = st.dataframe(data.tables_slot(rating_file, active_stations, time_slots).
                           style.background_gradient().set_precision(2), use_container_width=True)
@@ -83,21 +77,9 @@ with ratings_slot:
 with graph_slot:
     if len(active_stations) == 0 and rating_file:
         st.info(errors.choose_station)
-    if time_slots == 'Selectează tronsonul ' and rating_file:
-        st.info(errors.choose_slot)
     if time_slots == '2:00 - 6:00':
         st.info("Nu există audiențe la minut pentru intervalul 2:00 - 6:00")
-    if len(active_stations) > 0 and time_slots != 'Selectează tronsonul ' and time_slots != '2:00 - 6:00':
+    if len(active_stations) > 0 and time_slots != '2:00 - 6:00':
         gs = data.graphs_slot(rating_file, active_stations, time_slots)
         pltl_slt = px.line(gs, x=gs.index, y=active_stations, color_discrete_map=libraries.px_color_map)
         st.plotly_chart(pltl_slt)
-
-with plotly_test:
-    try:
-        x = px.line(data.graphs_whole_day(quarters_file, active_stations),
-                    x=data.graphs_whole_day(quarters_file, active_stations).index, y=active_stations,
-                    color_discrete_map=libraries.px_color_map)
-        st.plotly_chart(x, use_container_width=True)
-    except ValueError:
-        pass
-

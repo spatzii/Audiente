@@ -12,7 +12,7 @@ monthly_chart, compare_day = st.tabs(['Rapoarte lunare', 'Comparație zile'])
 
 
 def get_monthly_whole_day_ratings(year, month, channels, data_type='chart'):
-    file_location = f"/Users/stefanpana/PycharmProjects/Audiente/Data/Quarters/{str(year)}/" \
+    file_location = f"/Users/stefanpana/PycharmProjects/Audiente/Data/Complete/{str(year)}/" \
                     f"{str(datetime.datetime.strptime(month, '%B').date().month).zfill(2)}"
     whole_day_ratings = []
     for file in sorted(pathlib.Path(file_location).glob('*.csv')):
