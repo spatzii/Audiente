@@ -38,12 +38,14 @@ with st.sidebar:
             if st.session_state[channel.get('tv')] is True:
                 active_stations.append(channel.get('tv'))
 
+
 with at_a_glance:
-    if len(active_stations) == 0 and rating_file.exists():
-        st.info(errors.choose_station)
-    if len(active_stations) > 0:
-        for channel in active_stations:
-            st.write(data.daily_glance(rating_file, channel))
+    if rating_file.exists():
+        if len(active_stations) == 0:
+            st.info(errors.choose_station)
+        if len(active_stations) > 0:
+            for channel in active_stations:
+                st.write(data.daily_glance(rating_file, channel))
 
 with ratings_whole_day:
     if len(active_stations) == 0 and rating_file.exists():
@@ -63,8 +65,9 @@ with graph_all_day:
 
 with ratings_slot:
     with st.sidebar:
-        time_slots = st.selectbox('Selectează tronsonul: ', data.channel_names(),
-                                  key="tronson")
+        if rating_file.exists():
+            time_slots = st.selectbox('Selectează tronsonul: ',
+                                      cls.DayOperations(rating_file, active_stations).get_slot_names(), key="tronson")
     if len(active_stations) == 0 and rating_file:
         st.info(errors.choose_station)
     if len(active_stations) > 0 and time_slots != 'Selectează tronsonul ':
@@ -72,11 +75,12 @@ with ratings_slot:
                           style.background_gradient().set_precision(2), use_container_width=True)
 
 with graph_slot:
-    if len(active_stations) == 0 and rating_file:
-        st.info(errors.choose_station)
-    if time_slots == '2:00 - 6:00':
-        st.info("Nu există audiențe la minut pentru intervalul 2:00 - 6:00")
-    if len(active_stations) > 0 and time_slots != '2:00 - 6:00':
-        gs = data.graphs_slot(rating_file, active_stations, time_slots)
-        pltl_slt = px.line(gs, x=gs.index, y=active_stations, color_discrete_map=libraries.px_color_map)
-        st.plotly_chart(pltl_slt)
+    if rating_file.exists():
+        if len(active_stations) == 0 and rating_file:
+            st.info(errors.choose_station)
+        if time_slots == '2:00 - 6:00':
+            st.info("Nu există audiențe la minut pentru intervalul 2:00 - 6:00")
+        if len(active_stations) > 0 and time_slots != '2:00 - 6:00':
+            gs = data.graphs_slot(rating_file, active_stations, time_slots)
+            pltl_slt = px.line(gs, x=gs.index, y=active_stations, color_discrete_map=libraries.px_color_map)
+            st.plotly_chart(pltl_slt)

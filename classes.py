@@ -59,24 +59,21 @@ class Channel:
         self.file = file  # Data/Complete/YYYY/MM/YYYY-MM-DD.csv
         self.name = channel_name
         self.csv = pd.read_csv(self.file, index_col=0)
+        self.weekday = datetime.datetime.strptime(self.file.stem, '%Y-%m-%d').weekday()  # Int for weekday
 
     def get_rating_day(self):
         list_of_dataframes = []
         for slot in DayOperations(self.file, self.name).weekday_interpreter():
             list_of_dataframes.append(pd.concat([self.csv.loc[slot.get('start_q'):slot.get('end_q'), [self.name]],
                                                  pd.DataFrame.from_dict({f"Medie {slot.get('tronson')}": self.csv.loc[
-                                                                                                         slot.get(
-                                                                                                             'start_q'):slot.get(
-                                                                                                             'end_q'),
-                                                                                                         [
-                                                                                                             self.name]].mean()},
-                                                                        orient='index')]))
+                                                  slot.get('start_q'):slot.get('end_q'), [self.name]].mean()},
+                                                  orient='index')]))
         list_of_dataframes.append(pd.DataFrame([self.csv.loc['Whole day', self.name]],
                                                index=['Whole day'], columns=[self.name]))
         return np.around(pd.concat(list_of_dataframes), 2)
 
     def get_rating_slot(self, timeslot):
-        for slot in lb.digi24_weekdays:
+        for slot in DayOperations(self.file, self.name).weekday_interpreter():
             if slot['tronson'] == timeslot:
                 slot_start = slot.get('start_q')
                 slot_end = slot.get('end_q')
@@ -88,7 +85,7 @@ class Channel:
         return self.csv.loc['02:00 - 02:15':'25:45 - 26:00', self.name]
 
     def get_graph_slot(self, timeslot):
-        for slot in lb.digi24_weekdays:
+        for slot in DayOperations(self.file, self.name).weekday_interpreter():
             if slot['tronson'] == timeslot:
                 slot_start = slot.get('start_m')
                 slot_end = slot.get('end_m')
@@ -116,7 +113,8 @@ class Analyzer(Channel):
         # file_month = data.get_date_from_rtg(Channel(self.file, self.name).file).month
         file_year = DayOperations(self.file, self.name).get_date_from_rtg().year
         file_month = DayOperations(self.file, self.name).get_date_from_rtg().month
-        file_location = f"/Users/stefanpana/PycharmProjects/Audiente/Data/Complete/{file_year}/{str(file_month).zfill(2)}"
+        file_location = f'/Users/stefanpana/PycharmProjects/Audiente/Data/Complete/' \
+                        f'{file_year}/{str(file_month).zfill(2)}'
         whole_day_ratings_list = []
         for self.file in pathlib.Path(file_location).glob('*.csv'):
             whole_day = pd.read_csv(self.file, index_col=0).loc['Whole day', self.name]
@@ -136,19 +134,21 @@ class Analyzer(Channel):
 
 
 class DayOperations(Channel):
-    # Datetime interpreter from CSV name
     def get_date_from_rtg(self):
-        # Returns datetime obj from CSV file
-        return datetime.datetime.strptime(self.file.stem, '%Y-%m-%d').date()  # YYYY-MM-DD
+        # Returns datetime obj YYYY-MM-DD
+        return datetime.datetime.strptime(self.file.stem, '%Y-%m-%d').date()
 
     def weekday_interpreter(self):
         # Returns library location according to weekday (M-T/F/S/S)
-        current_day = DayOperations.get_date_from_rtg(self)
-        if current_day.weekday() <= 3:
+        if self.weekday <= 3:
             return libraries.digi24_weekdays
-        if current_day.weekday() == 4:
+        if self.weekday == 4:
             return libraries.digi24_friday
-        if current_day.weekday() == 5:
+        if self.weekday == 5:
             return libraries.digi24_saturday
-        if current_day.weekday() == 6:
+        if self.weekday == 6:
             return libraries.digi24_sunday
+
+    def get_slot_names(self):
+        return [slot.get('tronson') for slot in DayOperations.weekday_interpreter(self)]
+
