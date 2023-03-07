@@ -58,7 +58,8 @@ with graph_all_day:
         st.info(errors.choose_station)
     if len(active_stations) > 0:
         ghd = data.graphs_whole_day(rating_file, active_stations)
-        pltl_wh = px.line(ghd, x=ghd.index, y=active_stations, color_discrete_map=libraries.px_color_map)
+        pltl_wh = px.line(ghd, x=ghd.index, y=active_stations, color_discrete_map=libraries.px_color_map,
+                          labels={'Timebands': 'Sfert', 'value': 'Rating', 'variable': 'Post'})
         st.plotly_chart(pltl_wh)
 
 with ratings_slot:
@@ -79,5 +80,6 @@ with graph_slot:
             st.info("Nu există audiențe la minut pentru intervalul 2:00 - 6:00")
         if len(active_stations) > 0 and time_slots != '2:00 - 6:00':
             gs = data.graphs_slot(rating_file, active_stations, time_slots)
-            pltl_slt = px.line(gs, x=gs.index, y=active_stations, color_discrete_map=libraries.px_color_map)
+            pltl_slt = px.line(gs, x=gs.index, y=active_stations, color_discrete_map=libraries.px_color_map,
+                               labels={'Timebands': 'Minut', 'value': 'Rating', 'variable': 'Post'})
             st.plotly_chart(pltl_slt)
