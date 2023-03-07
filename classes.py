@@ -109,8 +109,6 @@ class Analyzer(Channel):
 
     def get_monthly_average(self):
         # Average of whole day ratings by current month for channel. Will be LAST 30 DAYS
-        # file_year = data.get_date_from_rtg(Channel(self.file, self.name).file).year
-        # file_month = data.get_date_from_rtg(Channel(self.file, self.name).file).month
         file_year = DayOperations(self.file, self.name).get_date_from_rtg().year
         file_month = DayOperations(self.file, self.name).get_date_from_rtg().month
         file_location = f'/Users/stefanpana/PycharmProjects/Audiente/Data/Complete/' \
