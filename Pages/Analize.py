@@ -14,7 +14,7 @@ monthly_chart, compare_day = st.tabs(['Rapoarte lunare', 'Comparație zile'])
 
 
 def get_monthly_whole_day_ratings(year, month, channels, data_type='chart'):
-    file_location = f"/Users/stefanpana/PycharmProjects/Audiente/Data/Complete/{str(year)}/" \
+    file_location = f"Data/Complete/{str(year)}/" \
                     f"{str(datetime.datetime.strptime(month, '%B').date().month).zfill(2)}"
     slot_dates = []
     whole_day_ratings = []
@@ -31,7 +31,7 @@ def get_monthly_whole_day_ratings(year, month, channels, data_type='chart'):
 
 
 def get_monthly_slot_ratings(year, month, when, timeslot, channels):
-    file_location = f"/Users/stefanpana/PycharmProjects/Audiente/Data/Complete/{str(year)}/" \
+    file_location = f"Data/Complete/{str(year)}/" \
                     f"{str(datetime.datetime.strptime(month, '%B').date().month).zfill(2)}"
     slot_ratings = []
     slot_dates = []

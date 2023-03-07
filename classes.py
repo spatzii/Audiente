@@ -111,8 +111,9 @@ class Analyzer(Channel):
         # Average of whole day ratings by current month for channel. Will be LAST 30 DAYS
         file_year = DayOperations(self.file, self.name).get_date_from_rtg().year
         file_month = DayOperations(self.file, self.name).get_date_from_rtg().month
-        file_location = f'/Users/stefanpana/PycharmProjects/Audiente/Data/Complete/' \
-                        f'{file_year}/{str(file_month).zfill(2)}'
+        # file_location = f'/Users/stefanpana/PycharmProjects/Audiente/Data/Complete/' \
+        #                 f'{file_year}/{str(file_month).zfill(2)}'
+        file_location = f'Data/Complete/{file_year}/{str(file_month).zfill(2)}'
         whole_day_ratings_list = []
         for self.file in pathlib.Path(file_location).glob('*.csv'):
             whole_day = pd.read_csv(self.file, index_col=0).loc['Whole day', self.name]
