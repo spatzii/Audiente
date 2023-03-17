@@ -28,17 +28,10 @@ def graphs_slot(csv, stations, timeslot):
     return pd.concat([cls.Channel(csv, station).get_graph_slot(timeslot) for station in stations], axis=1)
 
 
-def adjusted_share(csv):
-    whole_days_list = []
-    for channel in libraries.all_channels:
-        whole_days_list.append(cls.Analyzer(csv, channel.get('tv')).get_whole_day_rating())
-    return sum(whole_days_list)
-
-
 def daily_glance(file, station):
-    return f"""Audiența zilnică a {station} a fost de {cls.Analyzer(file, station).get_whole_day_rating()}, 
-    reprezentând {cls.Analyzer(file, station).daily_rtg_relative_change()}% din audiența medie lunară de 
-    {cls.Analyzer(file, station).get_monthly_average()}."""
+    return f"""Audiența zilnică a {station} a fost de {cls.Channel(file, station).get_raw('Whole day')}, 
+    reprezentând {cls.Channel(file, station).daily_rtg_relative_change()}% din audiența medie lunară de 
+    {cls.Channel(file, station).get_monthly_average()}."""
 
 
 def is_weekday(file):

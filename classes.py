@@ -62,6 +62,8 @@ class Channel:
         self.weekday = datetime.datetime.strptime(self.file.stem, '%Y-%m-%d').weekday()  # Int for weekday
 
     def get_rating_day(self):
+        # Dataframe for whole day using quarters.
+        # Adds slot averages based on what day it is using slot library
         list_of_dataframes = []
         for slot in DayOperations(self.file, self.name).weekday_interpreter():
             list_of_dataframes.append(pd.concat([self.csv.loc[slot.get('start_q'):slot.get('end_q'), [self.name]],
@@ -73,6 +75,7 @@ class Channel:
         return np.around(pd.concat(list_of_dataframes), 2)
 
     def get_rating_slot(self, timeslot):
+        # Dataframe for slot using quarters
         for slot in DayOperations(self.file, self.name).weekday_interpreter():
             if slot['tronson'] == timeslot:
                 slot_start = slot.get('start_q')
@@ -82,9 +85,11 @@ class Channel:
                                             [slot_start:slot_end, [self.name]].mean()}, orient='index')]), 2)
 
     def get_graph_day(self):
+        # Graph for whole day using quarters
         return self.csv.loc['02:00 - 02:15':'25:45 - 26:00', self.name]
 
     def get_graph_slot(self, timeslot):
+        # Graph for slot using minutes
         for slot in DayOperations(self.file, self.name).weekday_interpreter():
             if slot['tronson'] == timeslot:
                 slot_start = slot.get('start_m')
@@ -92,29 +97,23 @@ class Channel:
                 return self.csv.loc[slot_start:slot_end, self.name]
 
     def get_raw(self, loc_index):
-        return self.csv.loc[loc_index:, self.name]
+        # Returns raw values from CSV based on loc input
+        return self.csv.loc[loc_index:, self.name].values[0]
 
-    def get_slot_average(self, timeslot):
-        for slot in libraries.digi24_weekdays:
-            if slot['tronson'] == timeslot:
-                return pd.DataFrame(self.csv.loc[slot.get('start_q'):slot.get('end_q'), self.name].mean()).T
-
-
-class Analyzer(Channel):
-    # Analyze complex data for TV stations with scope broader than 1-day
-
-    def get_whole_day_rating(self):
-        # Whole day rating for channel in a particular day
-        return Channel(self.file, self.name).get_raw('Whole day').values[0]
+    # def get_slot_average(self, timeslot):
+    #     # Return DataFrame with average of ratings for selected slot
+    #     for slot in libraries.digi24_weekdays:
+    #         if slot['tronson'] == timeslot:
+    #             return pd.DataFrame(self.csv.loc[slot.get('start_q'):slot.get('end_q'), self.name].mean()).T
 
     def get_monthly_average(self):
         # Average of whole day ratings by current month for channel. Will be LAST 30 DAYS
+
         file_year = DayOperations(self.file, self.name).get_date_from_rtg().year
         file_month = DayOperations(self.file, self.name).get_date_from_rtg().month
-        # file_location = f'/Users/stefanpana/PycharmProjects/Audiente/Data/Complete/' \
-        #                 f'{file_year}/{str(file_month).zfill(2)}'
         file_location = f'Data/Complete/{file_year}/{str(file_month).zfill(2)}'
         whole_day_ratings_list = []
+
         for self.file in pathlib.Path(file_location).glob('*.csv'):
             whole_day = pd.read_csv(self.file, index_col=0).loc['Whole day', self.name]
             whole_day_ratings_list.append(whole_day)
@@ -122,14 +121,9 @@ class Analyzer(Channel):
 
     def daily_rtg_relative_change(self):
         # Percentage change in +/- on daily rating compared to monthly average
-        return np.around(((Analyzer(self.file, self.name).get_whole_day_rating() -
-                           Analyzer(self.file, self.name).get_monthly_average()) /
-                          Analyzer(self.file, self.name).get_monthly_average() * 100), 1)
-
-    def adjusted_share(self):
-        # Channel's share of rating from the sum of RELEVANT channels' share (only news channels)
-        total_news_share = data.adjusted_share(self.file)
-        return np.around((Analyzer.get_whole_day_rating(self) / total_news_share * 100), 1)
+        return np.around(((self.get_raw('Whole day') -
+                           self.get_monthly_average()) /
+                          self.get_monthly_average() * 100), 1)
 
 
 class DayOperations(Channel):
@@ -150,4 +144,3 @@ class DayOperations(Channel):
 
     def get_slot_names(self):
         return [slot.get('tronson') for slot in DayOperations.weekday_interpreter(self)]
-
