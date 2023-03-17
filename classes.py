@@ -61,6 +61,15 @@ class Channel:
         self.csv = pd.read_csv(self.file, index_col=0)
         self.weekday = datetime.datetime.strptime(self.file.stem, '%Y-%m-%d').weekday()  # Int for weekday
 
+    def get_slot_averages(self):
+        # Return dataframe containg only slot avg for selected day based on day and slot library
+        list_of_dataframes = []
+        for slot in DayOperations(self.file, self.name).weekday_interpreter():
+            list_of_dataframes.append(pd.DataFrame.from_dict({f"Medie {slot.get('tronson')}": self.csv.loc[
+                                                      slot.get('start_q'):slot.get('end_q'), [self.name]].mean()},
+                                                      orient='index'))
+        return np.around(pd.concat(list_of_dataframes), 2)
+
     def get_rating_day(self):
         # Dataframe for whole day using quarters.
         # Adds slot averages based on what day it is using slot library
@@ -99,12 +108,6 @@ class Channel:
     def get_raw(self, loc_index):
         # Returns raw values from CSV based on loc input
         return self.csv.loc[loc_index:, self.name].values[0]
-
-    # def get_slot_average(self, timeslot):
-    #     # Return DataFrame with average of ratings for selected slot
-    #     for slot in libraries.digi24_weekdays:
-    #         if slot['tronson'] == timeslot:
-    #             return pd.DataFrame(self.csv.loc[slot.get('start_q'):slot.get('end_q'), self.name].mean()).T
 
     def get_monthly_average(self):
         # Average of whole day ratings by current month for channel. Will be LAST 30 DAYS

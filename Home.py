@@ -46,6 +46,9 @@ with at_a_glance:
         if len(active_stations) > 0:
             for channel in active_stations:
                 st.write(data.daily_glance(rating_file, channel))
+            st.dataframe(pd.concat([cls.Channel(rating_file, channel).get_slot_averages()
+                                    for channel in active_stations], axis=1))
+
 
 with ratings_whole_day:
     if len(active_stations) == 0 and rating_file.exists():
