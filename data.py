@@ -28,12 +28,6 @@ def graphs_slot(csv, stations, timeslot):
     return pd.concat([cls.Channel(csv, station).get_graph_slot(timeslot) for station in stations], axis=1)
 
 
-def daily_glance(file, station):
-    return f"""Audiența zilnică a {station} a fost de {cls.Channel(file, station).get_raw('Whole day')}, 
-    reprezentând {cls.Channel(file, station).daily_rtg_relative_change()}% din audiența medie lunară de 
-    {cls.Channel(file, station).get_monthly_average()}."""
-
-
 def is_weekday(file):
     # Returns True if csv is weekday (M-T) or False if csv is weekend (F-S)
     if datetime.datetime.strptime(file.stem, '%Y-%m-%d').date().weekday() < 4:

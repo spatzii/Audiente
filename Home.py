@@ -1,11 +1,13 @@
-import streamlit as st
 import pathlib
 import data
 import libraries
 import errors
-import classes as cls
-import pandas as pd
+
 import plotly.express as px
+import pandas as pd
+import streamlit as st
+
+from classes import Channel, DayOperations
 
 col_img, col_hdr = st.columns(2)
 with col_img:
@@ -45,8 +47,8 @@ with at_a_glance:
             st.info(errors.choose_station)
         if len(active_stations) > 0:
             for channel in active_stations:
-                st.write(data.daily_glance(rating_file, channel))
-            st.dataframe(pd.concat([cls.Channel(rating_file, channel).get_slot_averages()
+                st.write(Channel(rating_file, channel).quick_data())
+            st.dataframe(pd.concat([Channel(rating_file, channel).get_slot_averages()
                                     for channel in active_stations], axis=1))
 
 
@@ -69,7 +71,7 @@ with ratings_slot:
     with st.sidebar:
         if rating_file.exists():
             time_slots = st.selectbox('Selectează tronsonul: ',
-                                      cls.DayOperations(rating_file, active_stations).get_slot_names(), key="tronson")
+                                      DayOperations(rating_file, active_stations).get_slot_names(), key="tronson")
     if len(active_stations) == 0 and rating_file:
         st.info(errors.choose_station)
     if len(active_stations) > 0 and time_slots != 'Selectează tronsonul ':

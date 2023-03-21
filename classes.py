@@ -128,6 +128,11 @@ class Channel:
                            self.get_monthly_average()) /
                           self.get_monthly_average() * 100), 1)
 
+    def quick_data(self):
+        return f"""Audiența zilnică a {self.name} a fost de {self.get_raw('Whole day')}, 
+            reprezentând {self.daily_rtg_relative_change()}% din audiența medie lunară de 
+            {self.get_monthly_average()}."""
+
 
 class DayOperations(Channel):
     def get_date_from_rtg(self):
@@ -146,4 +151,5 @@ class DayOperations(Channel):
             return libraries.digi24_sunday
 
     def get_slot_names(self):
+        # Returns names of slots from library according to day of the week
         return [slot.get('tronson') for slot in DayOperations.weekday_interpreter(self)]
