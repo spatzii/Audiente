@@ -61,6 +61,14 @@ class Channel:
         self.csv = pd.read_csv(self.file, index_col=0)
         self.weekday = datetime.datetime.strptime(self.file.stem, '%Y-%m-%d').weekday()  # Int for weekday
 
+    @staticmethod
+    # Applies numpy around and concats dataframes
+    def concat_and_around(first_df, second_df=None):
+        if second_df is None:
+            return np.around(pd.concat(first_df), 2)
+        else:
+            return np.around(pd.concat(first_df, second_df), 2)
+
     def get_slot_averages(self):
         # Return dataframe containg only slot avg for selected day based on day and slot library
         list_of_dataframes = []
@@ -68,7 +76,7 @@ class Channel:
             list_of_dataframes.append(pd.DataFrame.from_dict({f"Medie {slot.get('tronson')}": self.csv.loc[
                                                       slot.get('start_q'):slot.get('end_q'), [self.name]].mean()},
                                                       orient='index'))
-        return np.around(pd.concat(list_of_dataframes), 2)
+        return self.concat_and_around(list_of_dataframes)
 
     def get_rating_day(self):
         # Dataframe for whole day using quarters.
@@ -81,7 +89,7 @@ class Channel:
                                                   orient='index')]))
         list_of_dataframes.append(pd.DataFrame([self.csv.loc['Whole day', self.name]],
                                                index=['Whole day'], columns=[self.name]))
-        return np.around(pd.concat(list_of_dataframes), 2)
+        return self.concat_and_around(list_of_dataframes)
 
     def get_rating_slot(self, timeslot):
         # Dataframe for slot using quarters
@@ -89,9 +97,10 @@ class Channel:
             if slot['tronson'] == timeslot:
                 slot_start = slot.get('start_q')
                 slot_end = slot.get('end_q')
-                return np.around(pd.concat([self.csv.loc[slot_start:slot_end, [self.name]],
-                                            pd.DataFrame.from_dict({f"Medie {slot.get('tronson')}": self.csv.loc
-                                            [slot_start:slot_end, [self.name]].mean()}, orient='index')]), 2)
+                slot_ratings = self.csv.loc[slot_start:slot_end, [self.name]]
+                slot_mean = pd.DataFrame.from_dict({f"Medie {slot.get('tronson')}": self.csv.loc[slot_start:slot_end,
+                                                                                    [self.name]].mean()}, orient='index')
+                return self.concat_and_around([slot_ratings, slot_mean])
 
     def get_graph_day(self):
         # Graph for whole day using quarters
