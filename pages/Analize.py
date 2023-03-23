@@ -1,6 +1,4 @@
-import datetime
-import classes as cls
-import data
+from datetime import datetime, date
 import libraries
 import numpy as np
 import pandas as pd
@@ -13,15 +11,23 @@ import plotly.express as px
 monthly_chart, compare_day = st.tabs(['Rapoarte lunare', 'Comparație zile'])
 
 
+def is_weekday(file):
+    # Returns True if csv is weekday (M-T) or False if csv is weekend (F-S)
+    if datetime.strptime(file.stem, '%Y-%m-%d').date().weekday() < 4:
+        return True
+    if datetime.strptime(file.stem, '%Y-%m-%d').date().weekday() > 3:
+        return False
+
+
 def get_monthly_whole_day_ratings(year, month, channels, data_type='chart'):
     file_location = f"Data/Complete/{str(year)}/" \
-                    f"{str(datetime.datetime.strptime(month, '%B').date().month).zfill(2)}"
+                    f"{str(datetime.strptime(month, '%B').date().month).zfill(2)}"
     slot_dates = []
     whole_day_ratings = []
     for file in sorted(pathlib.Path(file_location).glob('*.csv')):
         whole_day = pd.read_csv(file, index_col=0).loc['Whole day', channels]
         whole_day_ratings.append(whole_day)
-        slot_dates.append(datetime.datetime.strptime(file.stem, '%Y-%m-%d').date())
+        slot_dates.append(datetime.strptime(file.stem, '%Y-%m-%d').date())
     monthly_graph_df = pd.DataFrame(whole_day_ratings,
                                     index=slot_dates)
     if data_type == 'chart':
@@ -32,7 +38,7 @@ def get_monthly_whole_day_ratings(year, month, channels, data_type='chart'):
 
 def get_monthly_slot_ratings(year, month, when, timeslot, channels):
     file_location = f"Data/Complete/{str(year)}/" \
-                    f"{str(datetime.datetime.strptime(month, '%B').date().month).zfill(2)}"
+                    f"{str(datetime.strptime(month, '%B').date().month).zfill(2)}"
     slot_ratings = []
     slot_dates = []
     start_q = ''
@@ -40,25 +46,25 @@ def get_monthly_slot_ratings(year, month, when, timeslot, channels):
     match when:
         case 'weekday':
             for file in sorted(pathlib.Path(file_location).glob('*.csv')):
-                if data.is_weekday(file) is True:
+                if is_weekday(file) is True:
                     for period in libraries.digi24_weekdays:
                         if timeslot == period.get('tronson'):
                             start_q = period.get('start_q')
                             end_q = period.get('end_q')
                     slot = pd.read_csv(file, index_col=0).loc[start_q:end_q, channels].mean()
                     slot_ratings.append(slot)
-                    slot_dates.append(datetime.datetime.strptime(file.stem, '%Y-%m-%d').date())
+                    slot_dates.append(datetime.strptime(file.stem, '%Y-%m-%d').date())
 
         case 'weekend':
             for file in sorted(pathlib.Path(file_location).glob('*.csv')):
-                if data.is_weekday(file) is False:
+                if is_weekday(file) is False:
                     for period in libraries.digi24_weekend:
                         if timeslot == period.get('tronson'):
                             start_q = period.get('start_q')
                             end_q = period.get('end_q')
                     slot = pd.read_csv(file, index_col=0).loc[start_q:end_q, channels].mean()
                     slot_ratings.append(slot)
-                    slot_dates.append(datetime.datetime.strptime(file.stem, '%Y-%m-%d').date())
+                    slot_dates.append(datetime.strptime(file.stem, '%Y-%m-%d').date())
     return pd.DataFrame(slot_ratings, index=slot_dates)
 # Perioade de comparatie: Ultimele 30 de zile, 1 luna, 3 luni, 6 luni, un an
 # Evolutii tronson
@@ -75,7 +81,7 @@ with monthly_chart:
             checkbox.append(st.checkbox(label=channel.get('tv'), key=channel.get('tv')))
             if st.session_state[channel.get('tv')] is True:
                 active_stations_names.append(channel.get('tv'))
-    select_year = st.selectbox('Alege anul', [int(datetime.date.today().year)], key='monthly_y')
+    select_year = st.selectbox('Alege anul', [int(date.today().year)], key='monthly_y')
     select_month = st.selectbox('Alege luna', calendar.month_name, key='monthly_m')
 
     if st.session_state['selector'] == 'Zile':

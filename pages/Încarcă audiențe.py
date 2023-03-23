@@ -1,4 +1,3 @@
-import data
 import streamlit as st
 import classes as cls
 
