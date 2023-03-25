@@ -24,22 +24,19 @@ class CSVWriter:
                 raw_file.drop(avg_index, inplace=True)
         return raw_file
 
-    def read_xlsx(self, type, sheet: int):
+    def read_xlsx(self, xlsx_file, sheet: int):
         """Reads XLSX, skips header rows, sets index, reads all_stations list"""
 
-        return pd.read_excel(type,
+        return pd.read_excel(xlsx_file,
                              sheet_name=sheet, skiprows=[0, 1, 1143]).set_index('Timebands').loc[:, self.all_stations]
 
     def create_csv(self):
         pathlib.Path(self.csv_folder + self.filename[0] + '/' + self.filename[1]).mkdir(parents=True, exist_ok=True)
 
-        rating_file_quarter = self.read_xlsx(self.quarter, 1)
-        CSVWriter.clean_data(rating_file_quarter)
+        ratings_quarter = self.clean_data(self.read_xlsx(self.quarter, 1))
+        ratings_minute = self.clean_data(self.read_xlsx(self.minute, 3))
 
-        rating_file_minute = self.read_xlsx(self.minute, 3)
-        CSVWriter.clean_data(rating_file_minute)
-
-        pd.concat([rating_file_quarter, rating_file_minute]).to_csv(pathlib.Path(self.csv_folder
+        pd.concat([ratings_quarter, ratings_minute]).to_csv(pathlib.Path(self.csv_folder
                                                                                  + self.filename[0] + '/'
                                                                                  + self.filename[1] + '/'
                                                                                  + self.quarter.name.rstrip('.xlsx')[
@@ -56,10 +53,16 @@ class Channel:
         self.name = channel_name
         self.csv = pd.read_csv(self.file, index_col=0)
 
+    def slot_selector(self, timeslot):
+        """Searches library for requested slot"""
+        for slot in DayOperations(self.file).slot_library_selector():
+            if slot['tronson'] == timeslot:
+                return slot
+
     def get_slot_averages(self):
         """Return dataframe containg only slot avg for selected day based on day and slot library"""
         list_of_dataframes = []
-        for slot in DayOperations(self.file).weekday_interpreter():
+        for slot in DayOperations(self.file).slot_library_selector():
             list_of_dataframes.append(pd.DataFrame.from_dict({f"Medie {slot.get('tronson')}": self.csv.loc[
                                                       slot.get('start_q'):slot.get('end_q'), [self.name]].mean()},
                                                       orient='index'))
@@ -69,7 +72,7 @@ class Channel:
         """Dataframe for whole day using quarters.
         Adds slot averages based on what day it is using slot library"""
         list_of_dataframes = []
-        for slot in DayOperations(self.file).weekday_interpreter():
+        for slot in DayOperations(self.file).slot_library_selector():
             list_of_dataframes.append(pd.concat([self.csv.loc[slot.get('start_q'):slot.get('end_q'), [self.name]],
                                                  pd.DataFrame.from_dict({f"Medie {slot.get('tronson')}": self.csv.loc[
                                                   slot.get('start_q'):slot.get('end_q'), [self.name]].mean()},
@@ -78,29 +81,40 @@ class Channel:
                                                index=['Whole day'], columns=[self.name]))
         return pd.concat(list_of_dataframes)
 
+        # list_of_dataframes = []
+        # all_quarters = []
+        # for slot in DayOperations(self.file).slot_library_selector():
+        #     all_quarters.append(self.csv.loc[slot.get('start_q'):slot.get('end_q'), [self.name]])
+        #
+        # list_of_dataframes = pd.DataFrame(zip(self.get_slot_averages(), all_quarters))
+        # print(list_of_dataframes)
+        # list_of_dataframes.append(pd.DataFrame([self.csv.loc['Whole day', self.name]],
+        #                                        index=['Whole day'], columns=[self.name]))
+        #
+        # return pd.concat(list_of_dataframes)
+
     def get_daily_graph(self):
         """Graph for whole day using quarters"""
         return self.csv.loc['02:00 - 02:15':'25:45 - 26:00', self.name]
 
     def get_slot_ratings(self, timeslot):
         """Dataframe for slot using quarters"""
-        for slot in DayOperations(self.file).weekday_interpreter():
-            if slot['tronson'] == timeslot:
-                slot_start = slot.get('start_q')
-                slot_end = slot.get('end_q')
-                slot_ratings = self.csv.loc[slot_start:slot_end, [self.name]]
-                slot_mean = pd.DataFrame.from_dict({f"Medie {slot.get('tronson')}":
-                                                   self.csv.loc[slot_start:slot_end,
-                                                    [self.name]].mean()}, orient='index')
-                return pd.concat([slot_ratings, slot_mean])
+
+        slot = self.slot_selector(timeslot)
+        slot_start = slot.get('start_q')
+        slot_end = slot.get('end_q')
+        slot_ratings = self.csv.loc[slot_start:slot_end, [self.name]]
+        slot_mean = pd.DataFrame.from_dict({f"Medie {slot.get('tronson')}":
+                                            self.csv.loc[slot_start:slot_end, [self.name]].mean()}, orient='index')
+        return pd.concat([slot_ratings, slot_mean])
 
     def get_slot_graph(self, timeslot):
         """Graph for slot using minutes"""
-        for slot in DayOperations(self.file).weekday_interpreter():
-            if slot['tronson'] == timeslot:
-                slot_start = slot.get('start_m')
-                slot_end = slot.get('end_m')
-                return self.csv.loc[slot_start:slot_end, self.name]
+
+        slot = self.slot_selector(timeslot)
+        slot_start = slot.get('start_m')
+        slot_end = slot.get('end_m')
+        return self.csv.loc[slot_start:slot_end, self.name]
 
     def get_raw(self, loc_index):
         # Returns raw values from CSV based on loc input
@@ -112,11 +126,10 @@ class Channel:
         file_year = DayOperations(self.file).date.year
         file_month = DayOperations(self.file).date.month
         file_location = f'Data/Complete/{file_year}/{str(file_month).zfill(2)}'
-        whole_day_ratings_list = []
 
-        for self.file in pathlib.Path(file_location).glob('*.csv'):
-            whole_day = pd.read_csv(self.file, index_col=0).loc['Whole day', self.name]
-            whole_day_ratings_list.append(whole_day)
+        whole_day_ratings_list = [pd.read_csv(self.file, index_col=0).loc['Whole day', self.name] for self.file
+                                  in pathlib.Path(file_location).glob('*.csv')]
+
         return np.around(sum(whole_day_ratings_list) / len(whole_day_ratings_list), 2)
 
     def daily_rtg_relative_change(self):
@@ -126,8 +139,8 @@ class Channel:
                           self.get_monthly_average() * 100), 1)
 
     def quick_data(self):
-        return f"""Audiența zilnică a {self.name} a fost de {self.get_raw('Whole day')}, 
-            reprezentând {self.daily_rtg_relative_change()}% din audiența medie lunară de 
+        return f"""Audienta zilnica a {self.name} a fost de {self.get_raw('Whole day')}, 
+            reprezentand {self.daily_rtg_relative_change()}% din audienta medie lunara de 
             {self.get_monthly_average()}."""
 
 
@@ -139,7 +152,7 @@ class DayOperations:
         self.weekday = datetime.strptime(self.file.stem, '%Y-%m-%d').weekday()  # Int for weekday
         self.date = datetime.strptime(self.file.stem, '%Y-%m-%d').date()  # Datetime obj from CSV file name
 
-    def weekday_interpreter(self):
+    def slot_library_selector(self):
         """Returns library location according to weekday (M-T/F/S/S)"""
         if self.weekday <= 3:
             return libraries.digi24_weekdays
@@ -152,7 +165,7 @@ class DayOperations:
 
     def get_slot_names(self):
         """Returns names of slots from library according to day of the week"""
-        return [slot.get('tronson') for slot in DayOperations.weekday_interpreter(self)]
+        return [slot.get('tronson') for slot in DayOperations.slot_library_selector(self)]
 
 
 class DisplayDataFrames:

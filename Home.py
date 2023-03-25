@@ -50,7 +50,8 @@ with at_a_glance:
                 st.write(Channel(ratings, channel).quick_data())
             st.dataframe(pd.concat([Channel(ratings, channel).get_slot_averages()
                                     for channel in selected_stations], axis=1))
-        # PDFData(ratings).get_data()
+        if st.button('PDF'):
+            PDFData(ratings).get_data()
 
 
 with ratings_whole_day:
