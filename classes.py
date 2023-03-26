@@ -106,7 +106,7 @@ class Channel:
         slot_ratings = self.csv.loc[slot_start:slot_end, [self.name]]
         slot_mean = pd.DataFrame.from_dict({f"Medie {slot.get('tronson')}":
                                             self.csv.loc[slot_start:slot_end, [self.name]].mean()}, orient='index')
-        return pd.concat([slot_ratings, slot_mean])
+        return np.around(pd.concat([slot_ratings, slot_mean]), 2)
 
     def get_slot_graph(self, timeslot):
         """Graph for slot using minutes"""

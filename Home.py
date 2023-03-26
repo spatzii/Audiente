@@ -7,7 +7,7 @@ import pandas as pd
 import streamlit as st
 
 from classes import Channel, DayOperations, DisplayDataFrames
-from pdf_mail import PDFData
+from pdf_mail import PDFData, EmailData
 
 col_img, col_hdr = st.columns(2)
 with col_img:
@@ -52,7 +52,8 @@ with at_a_glance:
                                     for channel in selected_stations], axis=1))
         if st.button('PDF'):
             PDFData(ratings).get_data()
-
+        if st.button('email'):
+            EmailData(ratings).send_email()
 
 with ratings_whole_day:
     if len(selected_stations) == 0 and ratings.exists():
