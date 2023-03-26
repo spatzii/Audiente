@@ -39,7 +39,12 @@ with st.sidebar:
             checkbox.append(st.checkbox(label=channel.get('tv'), key=channel.get('tv')))
             if st.session_state[channel.get('tv')] is True:
                 selected_stations.append(channel.get('tv'))
-
+        time_slot = st.selectbox('Selectează tronsonul: ',
+                                 DayOperations(ratings).get_slot_names(), key="tronson")
+        if st.button('Generază PDF'):
+            PDFData(ratings).get_data()
+        if st.button('Trimite email'):
+            EmailData(ratings).send_email()
 
 with at_a_glance:
     if ratings.exists():
@@ -50,10 +55,6 @@ with at_a_glance:
                 st.write(Channel(ratings, channel).quick_data())
             st.dataframe(pd.concat([Channel(ratings, channel).get_slot_averages()
                                     for channel in selected_stations], axis=1))
-        if st.button('PDF'):
-            PDFData(ratings).get_data()
-        if st.button('email'):
-            EmailData(ratings).send_email()
 
 with ratings_whole_day:
     if len(selected_stations) == 0 and ratings.exists():
@@ -73,10 +74,7 @@ with graph_all_day:
         st.plotly_chart(pltl_wh)
 
 with ratings_slot:
-    with st.sidebar:
-        if ratings.exists():
-            time_slot = st.selectbox('Selectează tronsonul: ',
-                                     DayOperations(ratings).get_slot_names(), key="tronson")
+
     if len(selected_stations) == 0 and ratings:
         st.info(errors.choose_station)
     if len(selected_stations) > 0 and time_slot != 'Selectează tronsonul ':
