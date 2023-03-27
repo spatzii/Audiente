@@ -145,3 +145,6 @@ widgetsnbextension==4.0.5
 y-py==0.5.5
 ypy-websocket==0.8.2
 zipp==3.12.0
+
+fpdf~=1.7.2
+redmail~=0.6.0

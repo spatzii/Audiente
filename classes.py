@@ -36,12 +36,9 @@ class CSVWriter:
         ratings_quarter = self.clean_data(self.read_xlsx(self.quarter, 1))
         ratings_minute = self.clean_data(self.read_xlsx(self.minute, 3))
 
-        pd.concat([ratings_quarter, ratings_minute]).to_csv(pathlib.Path(self.csv_folder
-                                                                                 + self.filename[0] + '/'
-                                                                                 + self.filename[1] + '/'
-                                                                                 + self.quarter.name.rstrip('.xlsx')[
-                                                                                   -10:]
-                                                                                 + '.csv'))
+        pd.concat([ratings_quarter, ratings_minute]).to_csv(
+            pathlib.Path(self.csv_folder + self.filename[0] + '/' + self.filename[1] + '/' +
+                         self.quarter.name.rstrip('.xlsx')[-10:] + '.csv'))
 
 
 class Channel:
@@ -60,17 +57,18 @@ class Channel:
                 return slot
 
     def get_slot_averages(self):
-        """Return dataframe containg only slot avg for selected day based on day and slot library"""
+        """Return dataframe containg only slot averages for selected day based on day and slot library"""
         list_of_dataframes = []
         for slot in DayOperations(self.file).slot_library_selector():
-            list_of_dataframes.append(pd.DataFrame.from_dict({f"Medie {slot.get('tronson')}": self.csv.loc[
-                                                      slot.get('start_q'):slot.get('end_q'), [self.name]].mean()},
-                                                      orient='index'))
-        return np.around(pd.concat(list_of_dataframes), 2)
+            list_of_dataframes.append(pd.DataFrame.from_dict(
+                {f"Medie {slot.get('tronson')}":
+                 np.around(self.csv.loc[slot.get('start_q'):slot.get('end_q'), [self.name]].mean(), 2)},
+                orient='index'))
+        return pd.concat(list_of_dataframes)
 
     def get_daily_ratings(self):
         """Dataframe for whole day using quarters.
-        Adds slot averages based on what day it is using slot library"""
+        Adds slot averages based on day and slot library"""
         list_of_dataframes = []
         for slot in DayOperations(self.file).slot_library_selector():
             list_of_dataframes.append(pd.concat([self.csv.loc[slot.get('start_q'):slot.get('end_q'), [self.name]],
@@ -80,18 +78,6 @@ class Channel:
         list_of_dataframes.append(pd.DataFrame([self.csv.loc['Whole day', self.name]],
                                                index=['Whole day'], columns=[self.name]))
         return pd.concat(list_of_dataframes)
-
-        # list_of_dataframes = []
-        # all_quarters = []
-        # for slot in DayOperations(self.file).slot_library_selector():
-        #     all_quarters.append(self.csv.loc[slot.get('start_q'):slot.get('end_q'), [self.name]])
-        #
-        # list_of_dataframes = pd.DataFrame(zip(self.get_slot_averages(), all_quarters))
-        # print(list_of_dataframes)
-        # list_of_dataframes.append(pd.DataFrame([self.csv.loc['Whole day', self.name]],
-        #                                        index=['Whole day'], columns=[self.name]))
-        #
-        # return pd.concat(list_of_dataframes)
 
     def get_daily_graph(self):
         """Graph for whole day using quarters"""

@@ -1,10 +1,8 @@
-import plotly_express as px
 import pandas as pd
 from classes import Channel
 import fpdf
-import ssl
-from email.message import EmailMessage
 from redmail import gmail
+import pages.Setari as Settings
 
 
 class PDFData:
@@ -27,11 +25,10 @@ class PDFData:
 
 
 class EmailData:
-    context = ssl.create_default_context()
 
-    def __init__(self, file, email_receiver='pana.stefan@gmail.com'):
+    def __init__(self, file):
         self.file = file
-        self.email_receiver = email_receiver
+        self.email_receiver = Settings.return_email()
         self.email_sender = 'audiente.skd@gmail.com'
         self.email_password = 'itfwytyshlpoorbz'
         self.subject = f"Audiente {self.file.stem}"
@@ -49,7 +46,7 @@ class EmailData:
         return pd.concat([self.Digi.get_slot_ratings(slot), self.Antena.get_slot_ratings(slot)], axis=1)
 
     def send_email(self):
-        gmail.user_name = self.email_sender
+        gmail.username = self.email_sender
         gmail.password = self.email_password
         gmail.send(subject=self.subject,
                    receivers=[self.email_receiver],
