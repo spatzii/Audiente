@@ -16,6 +16,7 @@ class CSVWriter:
         self.minute = minute
         self.filename = quarter.name.rstrip('.xlsx')[-10:].split("-")  # [(YYYY), (MM), (DD)]
 
+
     @staticmethod
     def clean_data(raw_file):
         raw_file.columns = raw_file.columns.str.replace('.1', '', regex=False)
@@ -36,7 +37,7 @@ class CSVWriter:
         ratings_quarter = self.clean_data(self.read_xlsx(self.quarter, 1))
         ratings_minute = self.clean_data(self.read_xlsx(self.minute, 3))
 
-        pd.concat([ratings_quarter, ratings_minute]).to_csv(
+        file = pd.concat([ratings_quarter, ratings_minute]).to_csv(
             pathlib.Path(self.csv_folder + self.filename[0] + '/' + self.filename[1] + '/' +
                          self.quarter.name.rstrip('.xlsx')[-10:] + '.csv'))
 

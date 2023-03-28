@@ -2,7 +2,7 @@ import pandas as pd
 from classes import Channel
 import fpdf
 from redmail import gmail
-import pages.Setari as Settings
+from db_factory import EmailSettings
 
 
 class PDFData:
@@ -24,11 +24,11 @@ class PDFData:
         pdf.output('test.pdf')
 
 
-class EmailData:
+class SendEmail:
 
     def __init__(self, file):
         self.file = file
-        self.email_receiver = Settings.return_email()
+        self.email_receiver = EmailSettings().fetch_receiver()
         self.email_sender = 'audiente.skd@gmail.com'
         self.email_password = 'itfwytyshlpoorbz'
         self.subject = f"Audiente {self.file.stem}"
