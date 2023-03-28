@@ -7,7 +7,7 @@ import pandas as pd
 import streamlit as st
 
 from classes import Channel, DayOperations, DisplayDataFrames
-from pdf_mail import PDFData, SendEmail
+from output_factory import PDFData, SendEmail
 
 col_img, col_hdr = st.columns(2)
 with col_img:
@@ -42,6 +42,7 @@ with st.sidebar:
             PDFData(ratings).get_data()
         if st.button('Trimite email'):
             SendEmail(ratings).send_email()
+            SendEmail(ratings).email_slot_dataframe()
 
 with at_a_glance:
     if ratings.exists():

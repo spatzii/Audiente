@@ -17,14 +17,14 @@ digi24_weekdays = [{'tronson': '2:00 - 6:00', 'start_q': '02:00 - 02:15', 'end_q
                    {'tronson': '23:00 Știrile Serii',
                     'start_q': '23:00 - 23:15', 'end_q': '25:45 - 26:00', 'start_m': '23:00', 'end_m': '24:59'}]
 
-digi24_weekend = [{'tronson': 'Interval 2-6 Noapte', 'start_q': '02:00 - 02:15', 'end_q': '05:45 - 06:00'},
-                  {'tronson': 'Interval 6-9 Matinal', 'start_q': '06:00 - 06:15', 'end_q': '09:45 - 10:00',
+digi24_weekend = [{'tronson': 'Weekend 2-6 Noapte', 'start_q': '02:00 - 02:15', 'end_q': '05:45 - 06:00'},
+                  {'tronson': 'Weekend 6-9 Matinal', 'start_q': '06:00 - 06:15', 'end_q': '09:45 - 10:00',
                   'start_m': '06:00', 'end_m': '09:59'},
-                  {'tronson': 'Interval 10-14 Dimineață', 'start_q': '10:00 - 10:15', 'end_q': '14:45 - 15:00',
+                  {'tronson': 'Weekend 10-14 Dimineață', 'start_q': '10:00 - 10:15', 'end_q': '14:45 - 15:00',
                   'start_m': '10:00', 'end_m': '14:59'},
-                  {'tronson': "Interval 15-19 Amiază", 'start_q': '15:00 - 15:15', 'end_q': '19:45 - 20:00',
+                  {'tronson': "Weekend 15-19 Amiază", 'start_q': '15:00 - 15:15', 'end_q': '19:45 - 20:00',
                   'start_m': '15:00', 'end_m': '18:59'},
-                  {'tronson': 'Interval 20-25 Seară', 'start_q': '20:00 - 20:15', 'end_q': '24:45 - 25:00',
+                  {'tronson': 'Weekend 20-25 Seară', 'start_q': '20:00 - 20:15', 'end_q': '24:45 - 25:00',
                   'start_m': '20:00', 'end_m': '24:59'}]
 
 digi24_friday = [{'tronson': '2:00 - 6:00', 'start_q': '02:00 - 02:15', 'end_q': '05:45 - 06:00'},

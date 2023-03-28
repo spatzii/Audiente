@@ -16,7 +16,6 @@ class CSVWriter:
         self.minute = minute
         self.filename = quarter.name.rstrip('.xlsx')[-10:].split("-")  # [(YYYY), (MM), (DD)]
 
-
     @staticmethod
     def clean_data(raw_file):
         raw_file.columns = raw_file.columns.str.replace('.1', '', regex=False)
@@ -52,8 +51,11 @@ class Channel:
         self.csv = pd.read_csv(self.file, index_col=0)
 
     def slot_selector(self, timeslot):
-        """Searches library for requested slot"""
+        """Searches library for requested slot either by current day or from lib.weekend for email settings"""
         for slot in DayOperations(self.file).slot_library_selector():
+            if slot['tronson'] == timeslot:
+                return slot
+        for slot in libraries.digi24_weekend:
             if slot['tronson'] == timeslot:
                 return slot
 
@@ -85,8 +87,6 @@ class Channel:
         return self.csv.loc['02:00 - 02:15':'25:45 - 26:00', self.name]
 
     def get_slot_ratings(self, timeslot):
-        """Dataframe for slot using quarters"""
-
         slot = self.slot_selector(timeslot)
         slot_start = slot.get('start_q')
         slot_end = slot.get('end_q')
