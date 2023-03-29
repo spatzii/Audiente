@@ -4,6 +4,7 @@ import libraries
 import pathlib
 from datetime import datetime
 from output_factory import SendEmail
+from db_factory import EmailSettings
 
 
 class CSVWriter:
@@ -42,8 +43,12 @@ class CSVWriter:
         self.send_email()
 
     def send_email(self):
+        """Sends csv file to output_factory.SendEmail method for every user in database.
+        SendEmail checks users' settings for match of conditions to send email and for content. """
         csv = pathlib.Path(self.filepath)
-        SendEmail(csv).send_or_not_send()
+        for user in EmailSettings().fetch_receivers():
+            print(user)
+            SendEmail(csv, user).send_or_not_send()
 
 
 class Channel:

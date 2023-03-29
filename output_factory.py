@@ -27,15 +27,15 @@ class PDFData:
 
 class SendEmail:
 
-    def __init__(self, file):
+    def __init__(self, file, receiver):
         self.file = file
-        self.slot = EmailSettings().fetch_slot()
-        self.email_receiver = EmailSettings().fetch_receiver()
+        self.receiver = receiver
+        self.slot = EmailSettings().fetch_slot(self.receiver)
+
         self.email_sender = 'audiente.skd@gmail.com'
         self.email_password = 'itfwytyshlpoorbz'
         self.subject = f"Audiente {self.file.stem}"
 
-        # DE REFACUT BUCATA ASTA, E REDUNTANTA
         self.Digi = cls.Channel(self.file, 'Digi 24')
         self.Antena = cls.Channel(self.file, 'Antena 3 CNN')
 
@@ -43,6 +43,14 @@ class SendEmail:
     def get_ratings(channel):
         """Returns string with whole day ratings"""
         return f"Audienta {channel.name} whole day: {channel.get_raw('Whole day')}"
+
+    def check_slot_type(self):
+        """Checks slot type and returns True for weekend and False for weekday"""
+        weekend = False
+        for slot in lib.digi24_weekend:
+            if self.slot == slot.get('tronson'):
+                weekend = True
+        return weekend
 
     def get_slot(self):
         """Return slot depending on whether it's a weekday slot or weekend slot.
@@ -64,15 +72,9 @@ class SendEmail:
         return pd.concat([self.Digi.get_slot_ratings(self.get_slot()),
                           self.Antena.get_slot_ratings(self.get_slot())], axis=1)
 
-    def check_slot_type(self):
-        """Checks slot type and returns True for weekend and False for weekday"""
-        weekend = False
-        for slot in lib.digi24_weekend:
-            if self.slot == slot.get('tronson'):
-                weekend = True
-        return weekend
-
     def send_or_not_send(self):
+        """Checks if slot settings match uploaded CSV and sends email only if conditions apply.
+        check_slot_type returns True for weekend and False for weekday"""
         if cls.DayOperations(self.file).email_sending_settings() == 'weekend' and self.check_slot_type() is True:
             self.send_email()
         elif cls.DayOperations(self.file).email_sending_settings() == 'weekday' and self.check_slot_type() is False:
@@ -84,7 +86,7 @@ class SendEmail:
         gmail.username = self.email_sender
         gmail.password = self.email_password
         gmail.send(subject=self.subject,
-                   receivers=[self.email_receiver],
+                   receivers=[self.receiver],
                    html="""
                    <p>{{ratings_digi}}</p>
                    <p>{{ratings_a3}}</p>
