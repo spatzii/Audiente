@@ -43,7 +43,7 @@ class CSVWriter:
 
     def send_email(self):
         csv = pathlib.Path(self.filepath)
-        SendEmail(csv).send_email()
+        SendEmail(csv).send_or_not_send()
 
 
 class Channel:
@@ -57,7 +57,7 @@ class Channel:
 
     def slot_selector(self, timeslot):
         """Searches library for requested slot either by current day or from lib.weekend for email settings"""
-        for slot in DayOperations(self.file).slot_library_selector():
+        for slot in DayOperations(self.file).dataframe_slot_library_selector():
             if slot['tronson'] == timeslot:
                 return slot
         for slot in libraries.digi24_weekend:
@@ -67,7 +67,7 @@ class Channel:
     def get_slot_averages(self):
         """Return dataframe containg only slot averages for selected day based on day and slot library"""
         list_of_dataframes = []
-        for slot in DayOperations(self.file).slot_library_selector():
+        for slot in DayOperations(self.file).dataframe_slot_library_selector():
             list_of_dataframes.append(pd.DataFrame.from_dict(
                 {f"Medie {slot.get('tronson')}":
                  np.around(self.csv.loc[slot.get('start_q'):slot.get('end_q'), [self.name]].mean(), 2)},
@@ -78,7 +78,7 @@ class Channel:
         """Dataframe for whole day using quarters.
         Adds slot averages based on day and slot library"""
         list_of_dataframes = []
-        for slot in DayOperations(self.file).slot_library_selector():
+        for slot in DayOperations(self.file).dataframe_slot_library_selector():
             list_of_dataframes.append(pd.concat([self.csv.loc[slot.get('start_q'):slot.get('end_q'), [self.name]],
                                                  pd.DataFrame.from_dict({f"Medie {slot.get('tronson')}": self.csv.loc[
                                                   slot.get('start_q'):slot.get('end_q'), [self.name]].mean()},
@@ -145,7 +145,7 @@ class DayOperations:
         self.weekday = datetime.strptime(self.file.stem, '%Y-%m-%d').weekday()  # Int for weekday
         self.date = datetime.strptime(self.file.stem, '%Y-%m-%d').date()  # Datetime obj from CSV file name
 
-    def slot_library_selector(self):
+    def dataframe_slot_library_selector(self):
         """Returns library location according to weekday (M-T/F/S/S)"""
         if self.weekday <= 3:
             return libraries.digi24_weekdays
@@ -156,9 +156,15 @@ class DayOperations:
         if self.weekday == 6:
             return libraries.digi24_sunday
 
+    def email_sending_settings(self):
+        if self.weekday < 4:
+            return 'weekday'
+        if self.weekday >= 4:
+            return 'weekend'
+
     def get_slot_names(self):
         """Returns names of slots from library according to day of the week"""
-        return [slot.get('tronson') for slot in DayOperations.slot_library_selector(self)]
+        return [slot.get('tronson') for slot in DayOperations.dataframe_slot_library_selector(self)]
 
 
 class DisplayDataFrames:

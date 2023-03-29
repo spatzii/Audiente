@@ -64,6 +64,20 @@ class SendEmail:
         return pd.concat([self.Digi.get_slot_ratings(self.get_slot()),
                           self.Antena.get_slot_ratings(self.get_slot())], axis=1)
 
+    def check_slot_type(self):
+        """Checks slot type and returns True for weekend and False for weekday"""
+        weekend = False
+        for slot in lib.digi24_weekend:
+            if self.slot == slot.get('tronson'):
+                weekend = True
+        return weekend
+
+    def send_or_not_send(self):
+        if cls.DayOperations(self.file).email_sending_settings() == 'weekend' and self.check_slot_type() is True:
+            self.send_email()
+        elif cls.DayOperations(self.file).email_sending_settings() == 'weekday' and self.check_slot_type() is False:
+            self.send_email()
+
     def send_email(self):
         """Sends email with whole day string, whole day avg slots and selected quarter slot.
             Gets input from Settings - slot & email"""
