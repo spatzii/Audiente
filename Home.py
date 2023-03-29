@@ -7,7 +7,7 @@ import pandas as pd
 import streamlit as st
 
 from classes import Channel, DayOperations, DisplayDataFrames
-from output_factory import PDFData, SendEmail
+from Outputs import PDFData, SendEmail
 
 col_img, col_hdr = st.columns(2)
 with col_img:

@@ -2,7 +2,7 @@ import pandas as pd
 import classes as cls
 import fpdf
 from redmail import gmail
-from db_factory import EmailSettings
+from DatabaseOperations import EmailSettings
 import libraries as lib
 
 

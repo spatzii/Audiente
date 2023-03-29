@@ -2,9 +2,10 @@ import numpy as np
 import pandas as pd
 import libraries
 import pathlib
+
 from datetime import datetime
-from output_factory import SendEmail
-from db_factory import EmailSettings
+from Outputs import SendEmail
+from DatabaseOperations import EmailSettings
 
 
 class CSVWriter:

@@ -1,6 +1,6 @@
 import streamlit as st
 import libraries as lib
-from db_factory import EmailSettings
+from DatabaseOperations import EmailSettings
 
 
 def select_slot():
