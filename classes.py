@@ -3,6 +3,7 @@ import pandas as pd
 import libraries
 import pathlib
 from datetime import datetime
+from output_factory import SendEmail
 
 
 class CSVWriter:
@@ -15,6 +16,10 @@ class CSVWriter:
         self.quarter = quarter
         self.minute = minute
         self.filename = quarter.name.rstrip('.xlsx')[-10:].split("-")  # [(YYYY), (MM), (DD)]
+        pathlib.Path(self.csv_folder + self.filename[0] + '/' + self.filename[1]).mkdir(parents=True, exist_ok=True)
+
+        self.filepath = pathlib.Path(self.csv_folder + self.filename[0] + '/' + self.filename[1] + '/' +
+                                     self.quarter.name.rstrip('.xlsx')[-10:] + '.csv')
 
     @staticmethod
     def clean_data(raw_file):
@@ -31,14 +36,14 @@ class CSVWriter:
                              sheet_name=sheet, skiprows=[0, 1, 1143]).set_index('Timebands').loc[:, self.all_stations]
 
     def create_csv(self):
-        pathlib.Path(self.csv_folder + self.filename[0] + '/' + self.filename[1]).mkdir(parents=True, exist_ok=True)
-
         ratings_quarter = self.clean_data(self.read_xlsx(self.quarter, 1))
         ratings_minute = self.clean_data(self.read_xlsx(self.minute, 3))
+        pd.concat([ratings_quarter, ratings_minute]).to_csv(pathlib.Path(self.filepath))
+        self.send_email()
 
-        file = pd.concat([ratings_quarter, ratings_minute]).to_csv(
-            pathlib.Path(self.csv_folder + self.filename[0] + '/' + self.filename[1] + '/' +
-                         self.quarter.name.rstrip('.xlsx')[-10:] + '.csv'))
+    def send_email(self):
+        csv = pathlib.Path(self.filepath)
+        SendEmail(csv).send_email()
 
 
 class Channel:

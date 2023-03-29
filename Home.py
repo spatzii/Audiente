@@ -18,6 +18,7 @@ with col_hdr:
 selection = st.date_input('Selectează data audiențelor...', key='date_select')
 ratings = pathlib.Path(f"Data/Complete/{selection.strftime('%Y/%m')}/{selection.strftime('%Y-%m-%d')}.csv")
 
+
 at_a_glance, ratings_whole_day, graph_all_day, ratings_slot, graph_slot = st.tabs(['Date rapide',
                                                                                    'Audiențe whole day',
                                                                                    'Grafic whole day',
@@ -42,7 +43,6 @@ with st.sidebar:
             PDFData(ratings).get_data()
         if st.button('Trimite email'):
             SendEmail(ratings).send_email()
-            SendEmail(ratings).email_slot_dataframe()
 
 with at_a_glance:
     if ratings.exists():

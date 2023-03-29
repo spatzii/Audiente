@@ -1,6 +1,5 @@
 import streamlit as st
 import classes as cls
-
 quarters_list = []
 minutes_list = []
 
@@ -15,8 +14,11 @@ try:
     for file in minutes_and_quarters:
         cls.CSVWriter(file[0], file[1]).create_csv()
 
+
 except IndexError:
     pass
+
+
 
 
 

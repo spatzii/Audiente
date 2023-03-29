@@ -1,5 +1,5 @@
 import pandas as pd
-from classes import Channel
+import classes as cls
 import fpdf
 from redmail import gmail
 from db_factory import EmailSettings
@@ -9,8 +9,8 @@ import libraries as lib
 class PDFData:
     def __init__(self, file):
         self.file = file
-        self.Digi = Channel(self.file, 'Digi 24')
-        self.Antena = Channel(self.file, 'Antena 3 CNN')
+        self.Digi = cls.Channel(self.file, 'Digi 24')
+        self.Antena = cls.Channel(self.file, 'Antena 3 CNN')
 
     def get_data(self):
         data_digi = self.Digi.get_raw('Whole day')
@@ -36,8 +36,8 @@ class SendEmail:
         self.subject = f"Audiente {self.file.stem}"
 
         # DE REFACUT BUCATA ASTA, E REDUNTANTA
-        self.Digi = Channel(self.file, 'Digi 24')
-        self.Antena = Channel(self.file, 'Antena 3 CNN')
+        self.Digi = cls.Channel(self.file, 'Digi 24')
+        self.Antena = cls.Channel(self.file, 'Antena 3 CNN')
 
     @staticmethod
     def get_ratings(channel):
