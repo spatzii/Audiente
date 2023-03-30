@@ -7,7 +7,6 @@ import pandas as pd
 import streamlit as st
 
 from classes import Channel, DayOperations, DisplayDataFrames
-from Outputs import PDFData, SendEmail
 
 col_img, col_hdr = st.columns(2)
 with col_img:
@@ -15,10 +14,8 @@ with col_img:
 with col_hdr:
     st.title("Audiențe Digi24")
 
-selection = st.date_input('Selectează data audiențelor...', key='date_select')
-ratings = pathlib.Path(f"Data/Complete/{selection.strftime('%Y/%m')}/{selection.strftime('%Y-%m-%d')}.csv")
-
-
+selection = st.date_input('Selectează data audiențelor...', key='date_select')  # Datetime YYYY-MM-DD
+ratings = pathlib.Path(f"Data/Complete/{selection.year}/{selection.month}/{selection}.csv")
 at_a_glance, ratings_whole_day, graph_all_day, ratings_slot, graph_slot = st.tabs(['Date rapide',
                                                                                    'Audiențe whole day',
                                                                                    'Grafic whole day',
@@ -39,10 +36,6 @@ with st.sidebar:
                 selected_stations.append(channel.get('tv'))
         time_slot = st.selectbox('Selectează tronsonul: ',
                                  DayOperations(ratings).get_slot_names(), key="tronson")
-        if st.button('Generază PDF'):
-            PDFData(ratings).get_data()
-        if st.button('Trimite email'):
-            SendEmail(ratings).send_email()
 
 with at_a_glance:
     if ratings.exists():

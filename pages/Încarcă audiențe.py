@@ -1,5 +1,5 @@
 import streamlit as st
-import classes as cls
+from classes import CSVWriter
 quarters_list = []
 minutes_list = []
 
@@ -12,7 +12,7 @@ try:
             quarters_list.append(file)
     minutes_and_quarters = zip(quarters_list, minutes_list)
     for file in minutes_and_quarters:
-        cls.CSVWriter(file[0], file[1]).create_csv()
+        CSVWriter(file[0], file[1]).create_csv()
 
 
 except IndexError:

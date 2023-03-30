@@ -17,11 +17,11 @@ class CSVWriter:
     def __init__(self, quarter, minute):
         self.quarter = quarter
         self.minute = minute
-        self.filename = quarter.name.rstrip('.xlsx')[-10:].split("-")  # [(YYYY), (MM), (DD)]
-        pathlib.Path(self.csv_folder + self.filename[0] + '/' + self.filename[1]).mkdir(parents=True, exist_ok=True)
-
-        self.filepath = pathlib.Path(self.csv_folder + self.filename[0] + '/' + self.filename[1] + '/' +
-                                     self.quarter.name.rstrip('.xlsx')[-10:] + '.csv')
+        self.filedate = quarter.name.rstrip('.xlsx')[-10:]  # YYYY-MM-DD
+        self.date = datetime.strptime(self.filedate, '%Y-%m-%d')  # datetime YYYY-MM-DD
+        self.subfolders = self.csv_folder + str(self.date.year) + '/' + str(self.date.month) + '/'
+        pathlib.Path(self.subfolders).mkdir(parents=True, exist_ok=True)  # Creates YYYY//MM folders if they don't exist
+        self.filepath = pathlib.Path(self.subfolders + self.filedate + '.csv')
 
     @staticmethod
     def clean_data(raw_file):
@@ -41,14 +41,13 @@ class CSVWriter:
         ratings_quarter = self.clean_data(self.read_xlsx(self.quarter, 1))
         ratings_minute = self.clean_data(self.read_xlsx(self.minute, 3))
         pd.concat([ratings_quarter, ratings_minute]).to_csv(pathlib.Path(self.filepath))
-        self.send_email()
+        # self.send_email()
 
     def send_email(self):
         """Sends csv file to output_factory.SendEmail method for every user in database.
         SendEmail checks users' settings for match of conditions to send email and for content. """
         csv = pathlib.Path(self.filepath)
         for user in EmailSettings().fetch_receivers():
-            print(user)
             SendEmail(csv, user).send_or_not_send()
 
 
@@ -124,7 +123,7 @@ class Channel:
 
         file_year = DayOperations(self.file).date.year
         file_month = DayOperations(self.file).date.month
-        file_location = f'Data/Complete/{file_year}/{str(file_month).zfill(2)}'
+        file_location = f'Data/Complete/{file_year}/{file_month}'
 
         whole_day_ratings_list = [pd.read_csv(self.file, index_col=0).loc['Whole day', self.name] for self.file
                                   in pathlib.Path(file_location).glob('*.csv')]

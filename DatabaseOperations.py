@@ -3,7 +3,7 @@ import streamlit as st
 
 
 class EmailSettings:
-    """Creates ONE email id with selected slot for sending email information. Replaced for every address change"""
+    """Creates users with email & selected slot for sending email information"""
 
     def __init__(self):
         self.conn = db.connect('settings.db')
